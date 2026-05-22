@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PoseAlert — Cảnh báo Tư thế Ngồi Học</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+  <!-- Chart.js: Thư viện vẽ biểu đồ -->
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- ========== POPUP CẢNH BÁO ========== -->
+  <div id="alert-overlay" class="alert-overlay hidden">
+    <div class="alert-box">
+      <div class="alert-icon">⚠️</div>
+      <h2 id="alert-title">Cảnh báo Tư thế!</h2>
+      <p id="alert-message">Bạn đang cúi đầu! Hãy ngồi thẳng.</p>
+      <button onclick="closeAlert()">Đã hiểu, sửa ngay!</button>
+    </div>
+  </div>
+
+  <!-- ========== HEADER ========== -->
+  <header class="header">
+    <div class="logo">
+      <span class="logo-icon">🧘</span>
+      <span class="logo-text">Pose<span class="accent">Alert</span></span>
+    </div>
+    <div class="header-meta">
+      <span id="session-time">Phiên: 00:00:00</span>
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-label">Chờ khởi động</span>
+    </div>
+  </header>
+
+  <!-- ========== LAYOUT CHÍNH ========== -->
+  <main class="main-grid">
+
+    <!-- CỘT TRÁI: Camera + Kết quả nhận diện -->
+    <section class="panel camera-panel">
+      <div class="panel-title">📷 Camera & Nhận diện</div>
+
+      <div class="camera-container">
+        <!-- Canvas để Teachable Machine vẽ khung xương lên -->
+        <canvas id="canvas"></canvas>
+        <div class="camera-overlay" id="camera-overlay">
+          <div class="overlay-content">
+            <div class="big-icon">📷</div>
+            <p>Nhấn "Bắt đầu" để khởi động camera</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nút điều khiển -->
+      <div class="controls">
+        <button class="btn btn-start" id="btn-start" onclick="startApp()">▶ Bắt đầu</button>
+        <button class="btn btn-stop hidden" id="btn-stop" onclick="stopApp()">⏹ Dừng</button>
+      </div>
+
+      <!-- Kết quả % từng tư thế -->
+      <div class="pose-results" id="pose-results">
+        <!-- Sẽ được tạo động bằng JS -->
+      </div>
+    </section>
+
+    <!-- CỘT GIỮA: Trạng thái hiện tại + Timer cảnh báo -->
+    <section class="panel status-panel">
+      <div class="panel-title">📊 Trạng thái Hiện tại</div>
+
+      <!-- Hiển thị tư thế hiện tại với icon lớn -->
+      <div class="current-pose-display">
+        <div class="pose-icon-big" id="pose-icon">🪑</div>
+        <div class="pose-name" id="pose-name">Chưa nhận diện</div>
+        <div class="pose-confidence" id="pose-confidence">0%</div>
+      </div>
+
+      <!-- Thanh đếm ngược 30 giây -->
+      <div class="alert-timer-section" id="alert-timer-section">
+        <div class="timer-label">⏱ Giữ tư thế sai</div>
+        <div class="timer-bar-wrap">
+          <div class="timer-bar" id="timer-bar"></div>
+        </div>
+        <div class="timer-countdown" id="timer-countdown">0 / 30 giây</div>
+      </div>
+
+      <!-- Thống kê nhanh -->
+      <div class="quick-stats">
+        <div class="stat-card good">
+          <div class="stat-num" id="stat-good">0%</div>
+          <div class="stat-label">✅ Ngồi đúng</div>
+        </div>
+        <div class="stat-card bad">
+          <div class="stat-num" id="stat-bad">0%</div>
+          <div class="stat-label">⚠️ Tư thế sai</div>
+        </div>
+        <div class="stat-card alerts">
+          <div class="stat-num" id="stat-alerts">0</div>
+          <div class="stat-label">🔔 Cảnh báo</div>
+        </div>
+      </div>
+
+      <!-- Nút điều khiển Pomodoro -->
+      <div class="panel-title" style="margin-top:1.5rem;">🍅 Pomodoro Timer</div>
+      <div class="pomodoro-section">
+        <div class="pomodoro-display">
+          <div class="pomodoro-time" id="pomodoro-time">25:00</div>
+          <div class="pomodoro-phase" id="pomodoro-phase">Tập trung học</div>
+        </div>
+        <div class="pomodoro-controls">
+          <button class="btn-pomo" id="btn-pomo-start" onclick="togglePomodoro()">▶ Bắt đầu</button>
+          <button class="btn-pomo btn-pomo-reset" onclick="resetPomodoro()">↺ Reset</button>
+        </div>
+        <div class="pomodoro-cycles">
+          Chu kỳ hoàn thành: <strong id="pomo-cycles">0</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- CỘT PHẢI: Biểu đồ thống kê -->
+    <section class="panel chart-panel">
+      <div class="panel-title">📈 Dashboard Thống kê Phiên</div>
+
+      <!-- Biểu đồ tròn: tỷ lệ tư thế -->
+      <div class="chart-wrap">
+        <canvas id="doughnut-chart"></canvas>
+      </div>
+      <div class="chart-legend" id="chart-legend"></div>
+
+      <!-- Biểu đồ đường: lịch sử tư thế theo thời gian -->
+      <div class="panel-title" style="margin-top:1.5rem; font-size:0.85rem;">📉 Lịch sử Tư thế (mỗi 5 giây)</div>
+      <div class="chart-wrap-line">
+        <canvas id="line-chart"></canvas>
+      </div>
+
+      <!-- Bảng log cảnh báo -->
+      <div class="panel-title" style="margin-top:1.5rem; font-size:0.85rem;">🗒 Nhật ký Cảnh báo</div>
+      <div class="alert-log" id="alert-log">
+        <p class="log-empty">Chưa có cảnh báo nào...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========== THƯ VIỆN ========== -->
+  <!-- Teachable Machine Pose: Thư viện của Google để chạy model AI -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/pose@0.8/dist/teachablemachine-pose.min.js"></script>
+  <!-- Chart.js: Thư viện vẽ biểu đồ -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <script src="script.js"></script>
+</body>
+</html>

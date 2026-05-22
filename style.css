@@ -1,0 +1,494 @@
+/* ================================================
+   PoseAlert — style.css
+   Giao diện: Dark Tech / AIoT aesthetic
+   Font: Space Mono (mono/code feel) + DM Sans (body)
+   ================================================ */
+
+/* ---------- CSS Variables (Màu sắc chủ đạo) ---------- */
+:root {
+  --bg-main: #0a0e1a;          /* Nền chính: xanh đen đậm */
+  --bg-panel: #111827;         /* Nền panel: xanh đen nhạt hơn */
+  --bg-card: #1a2235;          /* Nền card */
+  --accent: #00d4ff;           /* Màu nhấn: xanh cyan neon */
+  --accent-green: #00ff88;     /* Màu xanh lá: tư thế đúng */
+  --accent-red: #ff4757;       /* Màu đỏ: tư thế sai / cảnh báo */
+  --accent-yellow: #ffd700;    /* Màu vàng: warning */
+  --accent-orange: #ff6b35;    /* Màu cam: Pomodoro */
+  --text-primary: #e8eaf6;     /* Chữ chính */
+  --text-secondary: #7986a3;   /* Chữ phụ */
+  --border: #1e2d47;           /* Viền */
+  --glow-cyan: 0 0 20px rgba(0, 212, 255, 0.3);
+  --glow-green: 0 0 20px rgba(0, 255, 136, 0.3);
+  --glow-red: 0 0 20px rgba(255, 71, 87, 0.4);
+}
+
+/* ---------- Reset & Base ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  overflow-x: hidden;
+}
+
+/* Hiệu ứng lưới nền (grid background) */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ---------- HEADER ---------- */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.8rem 1.5rem;
+  background: rgba(10, 14, 26, 0.95);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+}
+
+.logo {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 1.3rem; font-weight: 700;
+}
+.logo-icon { font-size: 1.5rem; }
+.accent { color: var(--accent); }
+
+.header-meta {
+  display: flex; align-items: center; gap: 0.75rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem; color: var(--text-secondary);
+}
+
+/* Đèn trạng thái nhấp nháy */
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  transition: background 0.3s;
+}
+.status-dot.active {
+  background: var(--accent-green);
+  box-shadow: var(--glow-green);
+  animation: blink 1.5s infinite;
+}
+.status-dot.warning {
+  background: var(--accent-red);
+  box-shadow: var(--glow-red);
+  animation: blink 0.5s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ---------- LAYOUT CHÍNH ---------- */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative; z-index: 1;
+}
+
+@media (max-width: 1024px) {
+  .main-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .main-grid { grid-template-columns: 1fr; }
+}
+
+/* ---------- PANEL (Thẻ chứa nội dung) ---------- */
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex; flex-direction: column; gap: 1rem;
+  transition: border-color 0.3s;
+}
+.panel:hover { border-color: rgba(0,212,255,0.2); }
+
+.panel-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem; font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ---------- CAMERA ---------- */
+.camera-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+#canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  display: block;
+}
+
+.camera-overlay {
+  position: absolute; inset: 0;
+  background: rgba(10,14,26,0.9);
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.5s;
+}
+.camera-overlay.hidden { opacity: 0; pointer-events: none; }
+
+.overlay-content {
+  text-align: center; color: var(--text-secondary);
+}
+.big-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+
+/* ---------- NÚT BẤM ---------- */
+.controls {
+  display: flex; gap: 0.75rem;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: none; border-radius: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem; font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.05em;
+}
+
+.btn-start {
+  background: var(--accent);
+  color: var(--bg-main);
+  box-shadow: var(--glow-cyan);
+}
+.btn-start:hover { filter: brightness(1.2); transform: translateY(-1px); }
+
+.btn-stop {
+  background: var(--accent-red);
+  color: white;
+  box-shadow: var(--glow-red);
+}
+.btn-stop:hover { filter: brightness(1.2); }
+
+.hidden { display: none !important; }
+
+/* ---------- KẾT QUẢ TƯ THẾ (thanh %) ---------- */
+.pose-results {
+  display: flex; flex-direction: column; gap: 0.6rem;
+}
+
+.pose-bar-item {
+  display: flex; flex-direction: column; gap: 0.25rem;
+}
+
+.pose-bar-header {
+  display: flex; justify-content: space-between;
+  font-size: 0.78rem;
+}
+
+.pose-bar-label { color: var(--text-secondary); }
+.pose-bar-pct { font-family: 'Space Mono', monospace; font-weight: 700; }
+
+.pose-bar-track {
+  height: 6px; background: var(--bg-card);
+  border-radius: 99px; overflow: hidden;
+}
+
+.pose-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.3s ease;
+  background: var(--accent);
+}
+
+/* Màu của từng tư thế */
+.pose-bar-fill.good  { background: var(--accent-green); }
+.pose-bar-fill.bad-1 { background: var(--accent-red); }
+.pose-bar-fill.bad-2 { background: var(--accent-yellow); }
+.pose-bar-fill.bad-3 { background: var(--accent-orange); }
+
+/* ---------- TRẠNG THÁI HIỆN TẠI ---------- */
+.current-pose-display {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  background: var(--bg-card);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.current-pose-display.state-good {
+  border-color: var(--accent-green);
+  box-shadow: var(--glow-green);
+}
+.current-pose-display.state-bad {
+  border-color: var(--accent-red);
+  box-shadow: var(--glow-red);
+  animation: pulse-bad 1s infinite;
+}
+
+@keyframes pulse-bad {
+  0%, 100% { box-shadow: 0 0 10px rgba(255,71,87,0.3); }
+  50% { box-shadow: 0 0 30px rgba(255,71,87,0.6); }
+}
+
+.pose-icon-big { font-size: 2.5rem; margin-bottom: 0.5rem; }
+
+.pose-name {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.95rem; font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.pose-confidence {
+  font-size: 1.8rem; font-weight: 600;
+  color: var(--accent);
+  font-family: 'Space Mono', monospace;
+}
+
+/* ---------- TIMER CẢNH BÁO 30s ---------- */
+.alert-timer-section {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid var(--border);
+}
+
+.timer-label {
+  font-size: 0.78rem; color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.timer-bar-wrap {
+  height: 8px; background: var(--bg-main);
+  border-radius: 99px; overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.timer-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--accent-green), var(--accent-yellow), var(--accent-red));
+  border-radius: 99px;
+  transition: width 1s linear;
+}
+
+.timer-countdown {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+/* ---------- QUICK STATS ---------- */
+.quick-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border-radius: 8px; padding: 0.75rem;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.stat-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.3rem; font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.stat-label { font-size: 0.68rem; color: var(--text-secondary); }
+
+.stat-card.good .stat-num  { color: var(--accent-green); }
+.stat-card.bad .stat-num   { color: var(--accent-red); }
+.stat-card.alerts .stat-num { color: var(--accent-yellow); }
+
+/* ---------- POMODORO ---------- */
+.pomodoro-section {
+  background: var(--bg-card);
+  border-radius: 10px; padding: 1rem;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.pomodoro-display { margin-bottom: 1rem; }
+
+.pomodoro-time {
+  font-family: 'Space Mono', monospace;
+  font-size: 2.5rem; font-weight: 700;
+  color: var(--accent-orange);
+  text-shadow: 0 0 20px rgba(255,107,53,0.5);
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.pomodoro-phase {
+  font-size: 0.8rem; color: var(--text-secondary);
+}
+
+.pomodoro-controls {
+  display: flex; gap: 0.5rem; justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.btn-pomo {
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--accent-orange);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--accent-orange);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem; cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-pomo:hover {
+  background: var(--accent-orange);
+  color: var(--bg-main);
+}
+.btn-pomo-reset {
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+}
+.btn-pomo-reset:hover {
+  background: var(--text-secondary);
+  color: var(--bg-main);
+}
+
+.pomodoro-cycles {
+  font-size: 0.75rem; color: var(--text-secondary);
+}
+
+/* ---------- BIỂU ĐỒ ---------- */
+.chart-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto;
+}
+
+.chart-wrap-line {
+  position: relative;
+  width: 100%; height: 120px;
+}
+
+.chart-legend {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  justify-content: center;
+}
+
+.legend-item {
+  display: flex; align-items: center; gap: 0.3rem;
+  font-size: 0.72rem; color: var(--text-secondary);
+}
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ---------- ALERT LOG ---------- */
+.alert-log {
+  max-height: 140px;
+  overflow-y: auto;
+  display: flex; flex-direction: column; gap: 0.4rem;
+}
+.alert-log::-webkit-scrollbar { width: 4px; }
+.alert-log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+.log-item {
+  background: var(--bg-card);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.72rem;
+  border-left: 3px solid var(--accent-red);
+  display: flex; justify-content: space-between; gap: 0.5rem;
+}
+.log-time {
+  color: var(--text-secondary);
+  font-family: 'Space Mono', monospace;
+  flex-shrink: 0;
+}
+
+.log-empty { font-size: 0.75rem; color: var(--text-secondary); text-align: center; padding: 0.5rem; }
+
+/* ---------- POPUP CẢNH BÁO ---------- */
+.alert-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(5px);
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+.alert-overlay.hidden { display: none; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.alert-box {
+  background: var(--bg-panel);
+  border: 2px solid var(--accent-red);
+  border-radius: 16px;
+  padding: 2rem 2.5rem;
+  text-align: center;
+  max-width: 380px;
+  box-shadow: var(--glow-red), 0 20px 60px rgba(0,0,0,0.5);
+  animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+.alert-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+
+.alert-box h2 {
+  font-family: 'Space Mono', monospace;
+  color: var(--accent-red);
+  margin-bottom: 0.5rem;
+}
+
+.alert-box p {
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+  line-height: 1.6;
+}
+
+.alert-box button {
+  background: var(--accent-red);
+  color: white;
+  border: none; border-radius: 8px;
+  padding: 0.6rem 1.5rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem; cursor: pointer;
+  font-weight: 700;
+  transition: filter 0.2s;
+}
+.alert-box button:hover { filter: brightness(1.2); }
+
+/* ---------- Scrollbar toàn trang ---------- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-main); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
