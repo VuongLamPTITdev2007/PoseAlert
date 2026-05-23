@@ -803,6 +803,12 @@ function initCharts() {
  * initDoughnutChart() — Biểu đồ tròn: tỷ lệ các tư thế
  */
 function initDoughnutChart() {
+  // Destroy chart cũ nếu đã tồn tại (tránh lỗi "Canvas is already in use")
+  if (doughnutChart) {
+    doughnutChart.destroy();
+    doughnutChart = null;
+  }
+
   const labels = Object.keys(POSE_CONFIG);
   const colors = ["#00ff88", "#ff4757", "#ffd700", "#ff6b35"];
 
@@ -839,7 +845,9 @@ function initDoughnutChart() {
   });
 
   // Vẽ legend tự tạo (đẹp hơn legend mặc định)
+  // Xóa legend cũ trước khi vẽ lại (tránh bị trùng khi restart)
   const legendEl = document.getElementById("chart-legend");
+  legendEl.innerHTML = "";
   labels.forEach((label, i) => {
     const item = document.createElement("div");
     item.className = "legend-item";
@@ -874,6 +882,15 @@ function updateDoughnutChart() {
  * initLineChart() — Biểu đồ đường: lịch sử % ngồi đúng theo thời gian
  */
 function initLineChart() {
+  // Destroy chart cũ nếu đã tồn tại
+  if (lineChart) {
+    lineChart.destroy();
+    lineChart = null;
+  }
+  // Reset dữ liệu biểu đồ đường
+  lineChartLabels.length = 0;
+  lineChartData.length = 0;
+
   const ctx = document.getElementById("line-chart").getContext("2d");
 
   lineChart = new Chart(ctx, {
