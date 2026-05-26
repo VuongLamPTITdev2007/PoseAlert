@@ -159,3 +159,17 @@ function sanitizeId(name) {
     .replace(/đ/g, "d").replace(/Đ/g, "D")
     .replace(/\s+/g, "-");
 }
+// Bật/tắt chế độ giấu mặt
+function togglePrivacy() {
+  isPrivacyMode = !isPrivacyMode;
+  const btn = document.getElementById("btn-privacy");
+  if (isPrivacyMode) {
+    btn.style.background = "var(--accent-green)";
+    btn.style.color = "#000";
+    btn.textContent = "🕵️ Đã giấu mặt";
+  } else {
+    btn.style.background = "#374151";
+    btn.style.color = "white";
+    btn.textContent = "👻 Bảo mật";
+  }
+}

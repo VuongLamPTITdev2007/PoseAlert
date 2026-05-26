@@ -47,3 +47,5 @@ let pomodoroSeconds   = POMODORO_WORK_MINUTES * 60;
 let pomodoroIsWork    = true;  // true = học, false = nghỉ
 let pomodoroIsRunning = false;
 let pomodoroCycles    = 0;
+// chế độ ẩn danh người dùng ( chỉ hiện khung vẽ)
+let isPrivacyMode = false; 

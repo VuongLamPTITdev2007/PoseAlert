@@ -16,14 +16,23 @@ function drawFrame(poses) {
   const w = ctx.canvas.width;
   const h = ctx.canvas.height;
 
-  // Flip ngang (mirror) để người dùng thấy tự nhiên như soi gương
-  ctx.save();
-  ctx.translate(w, 0);
-  ctx.scale(-1, 1);
-  ctx.drawImage(video, 0, 0, w, h);
-  ctx.restore();
+  // ---- ĐÂY CHÍNH LÀ BƯỚC BỌC LẠI BẰNG LỆNH ĐIỀU KIỆN ----
+  if (!isPrivacyMode) {
+    // Nếu KHÔNG bật bảo mật -> Vẽ hình ảnh camera lên màn hình như bình thường
+    ctx.save();
+    ctx.translate(w, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, 0, 0, w, h);
+    ctx.restore();
+  } else {
+    // Nếu CÓ bật bảo mật -> Không vẽ camera nữa, mà tô một hình chữ nhật màu đen che toàn bộ màn hình
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0, w, h);
+  }
+  // -----------------------------------------------------
 
-  // Vẽ skeleton nếu phát hiện người trong frame
+  // Đoạn này nằm ngoài lệnh if-else che mặt, nên dù nền đen hay nền camera 
+  // thì khung xương (skeleton) màu xanh vẫn luôn luôn được vẽ đè lên
   if (poses.length > 0) {
     const keypoints = poses[0].keypoints;
     drawKeypoints(keypoints, w);
