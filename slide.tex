@@ -1,0 +1,122 @@
+\documentclass[12pt]{beamer}
+\usepackage[utf8]{vietnam}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\usetheme{Madrid}
+\usecolortheme{default}
+
+\title[PoseAlert]{PoseAlert: Ứng dụng Cảnh báo Tư thế Ngồi Học}
+\subtitle{Sử dụng TensorFlow.js và MoveNet}
+\author{Sinh viên: Vương Lâm}
+\institute{Bài Tập Cuối Kỳ}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Nội dung trình bày}
+    \tableofcontents
+\end{frame}
+
+\section{Đặt vấn đề}
+\begin{frame}{1. Đặt vấn đề}
+    \begin{itemize}
+        \item Thời gian ngồi học/làm việc trước màn hình máy tính ngày càng tăng.
+        \vspace{0.3cm}
+        \item Tư thế ngồi sai (cúi gập cổ, vẹo lưng, nhìn sát màn hình) về lâu dài gây các bệnh nghiêm trọng về cột sống và thị lực.
+        \vspace{0.3cm}
+        \item \textbf{Giải pháp cần thiết:} Một công cụ tự động nhắc nhở người dùng điều chỉnh tư thế theo thời gian thực mà không yêu cầu mua sắm thiết bị phần cứng đặc biệt.
+    \end{itemize}
+\end{frame}
+
+\section{Giới thiệu PoseAlert}
+\begin{frame}{2. Giới thiệu PoseAlert}
+    \textbf{PoseAlert} là ứng dụng web nhận diện tư thế qua webcam:
+    \vspace{0.5cm}
+    \begin{itemize}
+        \item Hoạt động hoàn toàn trên trình duyệt, không gửi video lên máy chủ (đảm bảo quyền riêng tư).
+        \item Nhận diện 4 trạng thái: Ngồi đúng, Cúi đầu, Vẹo lưng, Mắt quá gần màn hình.
+        \item Cảnh báo tự động bằng âm thanh/popup sau 30 giây ngồi sai liên tục.
+        \item Hỗ trợ bộ đếm Pomodoro (25/5 phút) và hệ thống biểu đồ Dashboard báo cáo phiên học.
+    \end{itemize}
+\end{frame}
+
+\section{Công nghệ sử dụng}
+\begin{frame}{3. Công nghệ sử dụng}
+    \begin{block}{AI \& Machine Learning}
+        \begin{itemize}
+            \item \textbf{TensorFlow.js}: Thực thi mô hình AI trên trình duyệt.
+            \item \textbf{MoveNet (SinglePose Lightning)}: Mô hình trích xuất 17 điểm khớp (keypoints) với tốc độ $\sim 30$ FPS (thời gian thực).
+        \end{itemize}
+    \end{block}
+    
+    \begin{block}{Web Frontend \& Triển khai}
+        \begin{itemize}
+            \item \textbf{HTML/CSS/JS}: Kiến trúc tách module (10 file js).
+            \item \textbf{Chart.js}: Vẽ biểu đồ kết quả trực quan.
+            \item \textbf{Web Audio API}: Tạo âm thanh thông báo.
+            \item \textbf{GitHub Pages}: Triển khai ứng dụng công khai.
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\section{Kiến trúc \& Thuật toán}
+\begin{frame}{4. Kiến trúc \& Thuật toán (1)}
+    Ứng dụng không huấn luyện phân loại ảnh trực tiếp mà dùng thuật toán \textbf{hình học trên điểm khớp (Keypoint Heuristics)}.
+    \vspace{0.5cm}
+    \begin{itemize}
+        \item \textbf{Phát hiện Cúi đầu:} \\ Tính khoảng cách theo trục Y từ điểm mũi đến tâm đường nối hai vai. Nếu tỷ lệ so với chiều rộng vai $< 0.5 \Rightarrow$ Cúi đầu.
+        \vspace{0.3cm}
+        \item \textbf{Phát hiện Mắt quá gần:} \\ Dùng khoảng cách 2 tai làm ước lượng bề ngang mặt. Nếu chiếm $> 40\%$ bề ngang camera $\Rightarrow$ Quá gần.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{4. Kiến trúc \& Thuật toán (2)}
+    \begin{itemize}
+        \item \textbf{Phát hiện Vẹo lưng:} \\ 
+        Góc hợp bởi đường nối hai vai so với phương ngang $> 12^\circ$, hoặc độ lệch tâm giữa trục vai và hông vượt quá $30\%$ $\Rightarrow$ Vẹo lưng.
+        \vspace{0.5cm}
+        \item \textbf{Kỹ thuật Làm mịn (Smoothing):} \\ 
+        Do camera đôi khi nhiễu, ứng dụng lưu 5 khung hình gần nhất và "bầu chọn đa số" (Majority Vote) để chốt kết quả tư thế, giúp giao diện không bị chớp nháy.
+    \end{itemize}
+\end{frame}
+
+\section{Giao diện và Kết quả}
+\begin{frame}{5. Giao diện và Kết quả}
+    \begin{itemize}
+        \item \textbf{Trải nghiệm người dùng}: Giao diện Dark theme thân thiện mắt, tích hợp khung camera (mirror mode) hiển thị đường vẽ khung xương (skeleton) theo chuyển động thực.
+        \vspace{0.3cm}
+        \item \textbf{Trạng thái trực quan}: Đồng hồ Pomodoro nổi bật và danh sách lịch sử cảnh báo vi phạm trong phiên.
+        \vspace{0.3cm}
+        \item \textbf{Báo cáo Đồ thị}: Tỷ lệ $\%$ thời gian ngồi chuẩn được tóm tắt rõ ràng bằng các biểu đồ của Chart.js.
+    \end{itemize}
+\end{frame}
+
+\section{Kết luận}
+\begin{frame}{6. Kết luận \& Hướng phát triển}
+    \textbf{Kết quả đạt được:} Xây dựng thành công ứng dụng hỗ trợ sức khỏe linh hoạt, hiệu năng cao, hoàn toàn dựa trên nền tảng web mã nguồn mở.
+    
+    \vspace{0.5cm}
+    \textbf{Hướng phát triển:}
+    \begin{itemize}
+        \item Kết hợp cơ sở dữ liệu (Firebase) lưu trữ biểu đồ sức khỏe qua từng tháng.
+        \item Đóng gói thành tiện ích mở rộng (Browser Extension) nhắc nhở bất kỳ khi nào đang dùng Chrome.
+        \item Khảo sát kết hợp với mô hình nhận diện khung xương 3D chuyên sâu.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \begin{center}
+        \Huge \textbf{Cảm ơn thầy cô và các bạn đã lắng nghe!}
+        
+        \vspace{1cm}
+        \large Xin mời xem bản Demo trực tiếp: \\
+        \url{https://vietdung29092007-dev.github.io/d-n-b-i-t-p-cu-i-k-/}
+    \end{center}
+\end{frame}
+
+\end{document}
