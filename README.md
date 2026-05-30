@@ -82,8 +82,6 @@ d-n-b-i-t-p-cu-i-k-/
 
 Dự án bao gồm sẵn mã nguồn tài liệu dành cho việc báo cáo học thuật:
 - **`bao_cao.tex`**: File báo cáo LaTeX chi tiết (5 chương).
-- **`slide.tex`**: File Slide trình chiếu LaTeX Beamer (chuẩn 16:9, Dark theme đồng bộ với ứng dụng).
-
 *Có thể biên dịch các file này thông qua Texmaker hoặc dán vào Overleaf để xuất PDF.*
 
 ---
@@ -92,4 +90,3 @@ Dự án bao gồm sẵn mã nguồn tài liệu dành cho việc báo cáo họ
 
 **Vương Lâm**
 - **Dự án**: Bài tập cuối kỳ
-- **Công nghệ**: TensorFlow.js, MoveNet, Chart.js, HTML5 Canvas, Web Audio API.
