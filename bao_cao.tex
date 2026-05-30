@@ -1,0 +1,106 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{vietnam}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+\title{
+    \vspace{2cm}
+    \textbf{\Huge BÁO CÁO BÀI TẬP CUỐI KỲ}\\
+    \vspace{1cm}
+    \Large \textbf{Đề tài: Ứng dụng Web Cảnh Báo Tư Thế Ngồi Học (PoseAlert)}\\
+    \vspace{0.5cm}
+    \large Ứng dụng nhận diện tư thế thời gian thực với TensorFlow.js và MoveNet
+}
+\author{Sinh viên thực hiện: Vương Lâm}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\newpage
+
+\tableofcontents
+\newpage
+
+\section{Mở đầu}
+\subsection{Lý do chọn đề tài}
+Tư thế ngồi học và làm việc sai lệch kéo dài dẫn đến nhiều vấn đề về cột sống, thị lực và sức khỏe tổng thể. Với sự phổ biến của việc học tập và làm việc trực tuyến, thời gian ngồi trước màn hình máy tính ngày càng tăng. Đề tài "PoseAlert - Ứng dụng cảnh báo tư thế ngồi" được thực hiện nhằm mục đích sử dụng trí tuệ nhân tạo, cụ thể là công nghệ ước lượng tư thế (Pose Estimation), để tự động nhắc nhở người dùng điều chỉnh tư thế ngồi thông qua webcam.
+
+\subsection{Mục tiêu đề tài}
+\begin{itemize}
+    \item Xây dựng một ứng dụng web hoạt động hoàn toàn trên trình duyệt, không yêu cầu cài đặt phần mềm hay huấn luyện mô hình phức tạp.
+    \item Nhận diện chính xác 4 trạng thái: Ngồi đúng, Cúi đầu, Vẹo lưng, và Mắt quá gần màn hình.
+    \item Cung cấp hệ thống cảnh báo thông minh bằng âm thanh và hình ảnh nếu người dùng ngồi sai tư thế liên tục trong 30 giây.
+    \item Tích hợp các tính năng hỗ trợ như đồng hồ Pomodoro (25 phút học/ 5 phút nghỉ) và biểu đồ thống kê phiên làm việc.
+\end{itemize}
+
+\section{Cơ sở lý thuyết và Công nghệ}
+\subsection{TensorFlow.js và MoveNet}
+Ứng dụng sử dụng TensorFlow.js, một thư viện mã nguồn mở hỗ trợ chạy các mô hình học máy trực tiếp trên trình duyệt bằng JavaScript. 
+Mô hình được sử dụng là \textbf{MoveNet SINGLEPOSE\_LIGHTNING}. Đây là một mô hình phát hiện tư thế cực nhanh, độ trễ thấp, rất phù hợp cho các ứng dụng theo dõi thời gian thực (real-time). MoveNet cung cấp tọa độ của 17 điểm khớp (keypoints) trên cơ thể người (chuẩn COCO), bao gồm: mắt, mũi, tai, vai, khuỷu tay, cổ tay, hông, đầu gối, và mắt cá chân.
+
+\subsection{Các công nghệ khác}
+\begin{itemize}
+    \item \textbf{HTML5/CSS3/JavaScript}: Xây dựng giao diện người dùng và logic xử lý. Cấu trúc mã nguồn được thiết kế theo hướng mô-đun (modular) giúp dễ dàng bảo trì. Sử dụng thẻ \texttt{<video>} ẩn để lấy luồng dữ liệu từ webcam và thẻ \texttt{<canvas>} để vẽ lại hình ảnh kết hợp với khung xương (skeleton).
+    \item \textbf{Chart.js}: Thư viện vẽ biểu đồ để thống kê tỷ lệ phần trăm tư thế đúng/sai và biểu diễn sự thay đổi tư thế theo thời gian.
+    \item \textbf{Web Audio API}: Tạo âm thanh cảnh báo và âm thanh chuông Pomodoro động mà không cần tải tệp tin âm thanh bên ngoài.
+    \item \textbf{GitHub Pages}: Nền tảng dùng để triển khai và lưu trữ ứng dụng tĩnh trên Internet.
+\end{itemize}
+
+\section{Phân tích và Thiết kế thuật toán}
+Thay vì huấn luyện một mô hình phân loại hình ảnh tổng quát, ứng dụng phân tích trực tiếp tọa độ hình học của các điểm khớp (keypoints) để xác định tư thế. Điều này giúp hệ thống hoạt động ổn định, nhẹ nhàng và không phụ thuộc vào bối cảnh (background) hay ánh sáng môi trường.
+
+\subsection{Thuật toán phát hiện "Cúi đầu"}
+Khi ngồi thẳng, điểm mũi ($y_{m\tilde{u}i}$) thường nằm ở vị trí cao hơn nhiều so với vai ($y_{vai}$). Khi cúi đầu, điểm mũi sẽ hạ xuống gần đường nối hai vai.
+\begin{itemize}
+    \item Tính $y_{trung\_t\hat{a}m\_vai} = (y_{vai\_tr\acute{a}i} + y_{vai\_ph\h{a}i}) / 2$
+    \item Tính chiều rộng vai: $W_{vai} = |x_{vai\_ph\h{a}i} - x_{vai\_tr\acute{a}i}|$
+    \item Tính tỷ lệ: $\text{ratio} = \frac{y_{trung\_t\hat{a}m\_vai} - y_{m\tilde{u}i}}{W_{vai}}$
+    \item Nếu $\text{ratio} < 0.5$, hệ thống nhận diện là đang "Cúi đầu".
+\end{itemize}
+
+\subsection{Thuật toán phát hiện "Vẹo lưng"}
+Việc vẹo lưng hoặc nghiêng người được xác định qua độ nghiêng của đường nối hai vai hoặc sự lệch tâm giữa vai và hông.
+\begin{itemize}
+    \item \textbf{Độ nghiêng vai:} Sử dụng hàm \texttt{atan2} để tính góc hợp bởi đường nối hai vai so với phương ngang. Nếu góc nghiêng $> 12^\circ$, ghi nhận vẹo lưng.
+    \item \textbf{Lệch ngang:} Tính khoảng cách theo trục X giữa trung điểm hai vai và trung điểm hai hông. Nếu khoảng cách này vượt quá $30\%$ chiều rộng vai, ghi nhận nghiêng người.
+\end{itemize}
+
+\subsection{Thuật toán phát hiện "Mắt quá gần"}
+Sử dụng tỷ lệ kích thước khuôn mặt so với toàn bộ khung hình webcam để ước lượng khoảng cách.
+\begin{itemize}
+    \item Khoảng cách giữa hai tai (hoặc khoảng cách hai mắt $\times 2.5$) được xem là chiều rộng khuôn mặt.
+    \item Tỷ lệ $\text{face\_ratio} = \frac{\text{Chiều rộng khuôn mặt}}{\text{Chiều rộng khung hình canvas}}$
+    \item Nếu $\text{face\_ratio} > 40\%$, hệ thống nhận diện "Mắt quá gần màn hình".
+\end{itemize}
+
+\subsection{Kỹ thuật làm mịn (Smoothing)}
+Do tín hiệu từ webcam có thể bị nhiễu cục bộ trong vài khung hình, ứng dụng sử dụng bộ đệm lưu 5 khung hình (frames) gần nhất và áp dụng nguyên tắc "bầu chọn đa số" (majority vote) để xác định tư thế chính thức. Điều này giúp giao diện mượt mà và không bị nhấp nháy kết quả khi người dùng chuyển động nhẹ.
+
+\section{Kết quả đạt được}
+\subsection{Giao diện và Trải nghiệm người dùng}
+\begin{itemize}
+    \item Ứng dụng có giao diện hiện đại (Dark theme), dễ sử dụng, bao gồm màn hình camera được lật ngang như gương (mirror) với bộ lọc khung xương (skeleton), các thanh tiến trình hiển thị xác suất phân loại tư thế.
+    \item \textbf{Tính năng Pomodoro:} Tích hợp hẹn giờ 25 phút làm việc tập trung và 5 phút nghỉ ngơi, hỗ trợ quản lý thời gian học tập khoa học.
+    \item \textbf{Thống kê và Báo cáo:} Biểu đồ hình tròn hiển thị tỷ lệ phần trăm các loại tư thế. Biểu đồ đường hiển thị biến thiên tư thế tốt theo thời gian. Bảng nhật ký cảnh báo ghi lại chi tiết các mốc thời gian vi phạm.
+\end{itemize}
+
+\subsection{Hiệu năng phần mềm}
+Nhờ sử dụng phiên bản MoveNet Lightning kết hợp với mô hình thuật toán hình học đơn giản thay vì mạng nơ-ron học sâu phức tạp ở bước phân loại, hệ thống đạt tốc độ xử lý ước lượng khoảng 30 FPS. Điều này đảm bảo hiệu suất thời gian thực trơn tru mà không làm nóng máy hay tiêu tốn quá mức tài nguyên CPU/RAM của trình duyệt. 
+
+\section{Kết luận và Hướng phát triển}
+Đề tài đã hoàn thành việc xây dựng một hệ thống cảnh báo tư thế thông minh hoạt động trực tiếp trên trình duyệt. Việc áp dụng các thuật toán phân tích điểm khớp (keypoints) giúp ứng dụng gọn nhẹ, độ chính xác cao đối với mục đích sử dụng cá nhân và dễ dàng tinh chỉnh cấu hình ngưỡng mà không cần phải thực hiện quá trình huấn luyện lại mô hình tốn kém thời gian.
+
+\textbf{Hướng phát triển tương lai:}
+\begin{itemize}
+    \item Mở rộng nhận diện tư thế ngửa cổ gáy bằng cách kết hợp phân tích chiều sâu nếu có thiết bị hỗ trợ hoặc nâng cấp lên mô hình MoveNet phiên bản 3D.
+    \item Lưu trữ thống kê dài hạn bằng cơ sở dữ liệu trên đám mây để người dùng theo dõi tiến trình cải thiện tư thế của mình trong nhiều tuần.
+    \item Phát triển thành tiện ích mở rộng (Browser Extension) để có thể cảnh báo nổi (pop-up) trên bất kỳ trang web nào người dùng đang xem.
+\end{itemize}
+
+\end{document}
