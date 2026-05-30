@@ -1,156 +1,84 @@
-# 🧘 PoseAlert — Cảnh báo Tư thế Ngồi Học
+# 🧘 PoseAlert — Hệ thống Nhận diện và Cảnh báo Tư thế AI
 
-> Ứng dụng web nhận diện tư thế ngồi học theo thời gian thực, sử dụng **TensorFlow.js MoveNet** để phân tích 17 điểm keypoint trên cơ thể — không cần train model, không cần URL, hoạt động ngay trong trình duyệt.
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Truy_cập_ngay-success?style=for-the-badge&logo=github)](https://vietdung29092007-dev.github.io/d-n-b-i-t-p-cu-i-k-/)
+[![TensorFlow.js](https://img.shields.io/badge/TensorFlow.js-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://www.tensorflow.org/js)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)]()
 
-### 🌐 [Dùng thử ngay → https://vietdung29092007-dev.github.io/d-n-b-i-t-p-cu-i-k-/](https://vietdung29092007-dev.github.io/d-n-b-i-t-p-cu-i-k-/)
-
----
-
-## 📸 Tính năng
-
-| Tính năng | Mô tả |
-|---|---|
-| 🤖 **Nhận diện tư thế realtime** | Phân tích 4 tư thế: Ngồi đúng, Cúi đầu, Vẹo lưng, Mắt quá gần |
-| ⚠️ **Cảnh báo thông minh** | Popup + âm thanh sau 30 giây giữ nguyên tư thế sai liên tục |
-| 🦴 **Vẽ skeleton trực quan** | Hiển thị 17 keypoint và đường xương lên canvas camera |
-| 📊 **Dashboard thống kê** | Biểu đồ tròn tỷ lệ tư thế + biểu đồ đường lịch sử phiên |
-| 🍅 **Pomodoro Timer** | Hẹn giờ 25 phút học / 5 phút nghỉ tích hợp sẵn |
-| 🔔 **Nhật ký cảnh báo** | Lưu lại lịch sử các lần cảnh báo trong phiên |
+> Ứng dụng web nhận diện tư thế ngồi học theo thời gian thực (Real-time). Tích hợp đồng hồ Pomodoro và Dashboard thống kê sức khỏe. Hoạt động 100% trên trình duyệt (Client-side) đảm bảo quyền riêng tư tối đa.
 
 ---
 
-## 🚀 Cách sử dụng
+## 🌟 Tính năng nổi bật
 
-### Yêu cầu
-- Trình duyệt hiện đại (Chrome, Edge, Firefox)
-- Webcam
-- Kết nối internet (lần đầu để tải model từ CDN)
-
-### Chạy ứng dụng
-
-```
-1. Mở file index.html bằng trình duyệt
-   (hoặc serve qua localhost để đảm bảo camera hoạt động)
-
-2. Nhấn nút "▶ Bắt đầu"
-
-3. Cho phép truy cập camera khi được hỏi
-
-4. Đợi ~2–3 giây để model MoveNet tải xong
-
-5. Bắt đầu sử dụng!
-```
-
-> **Lưu ý:** Một số trình duyệt yêu cầu trang phải chạy qua `https://` hoặc `localhost` mới cho phép truy cập camera. Nếu mở file trực tiếp gặp lỗi camera, hãy dùng extension **Live Server** (VS Code) hoặc lệnh:
-> ```bash
-> npx serve .
-> ```
+- 🤖 **Nhận diện AI Thời gian thực**: Tích hợp mô hình `MoveNet (Lightning)` cực nhanh, quét 17 điểm khớp trên cơ thể.
+- 🎯 **Phân tích 4 Tư thế**: Nhận diện chuẩn xác *Ngồi đúng*, *Cúi đầu*, *Vẹo lưng*, và *Mắt quá gần*.
+- ⚠️ **Hệ thống Cảnh báo Thông minh**: Tự động phát âm thanh chuông và hiển thị popup nếu giữ tư thế sai liên tục trong 30 giây.
+- 🍅 **Pomodoro Timer**: Tích hợp đồng hồ đếm ngược 25 phút làm việc / 5 phút nghỉ ngơi giúp duy trì sự tập trung.
+- 📊 **Dashboard Thống kê**: Biểu đồ hình tròn và biểu đồ đường phân tích tỷ lệ tư thế chuẩn trong suốt phiên học.
+- 🔒 **Bảo mật Quyền riêng tư**: Camera không bao giờ được ghi lại hay gửi lên bất kỳ máy chủ nào. Mọi xử lý đều diễn ra ngay trên máy của bạn.
 
 ---
 
-## 🧠 Công nghệ sử dụng
+## 🚀 Hướng dẫn Sử dụng
 
-| Thư viện | Vai trò |
-|---|---|
-| [TensorFlow.js](https://www.tensorflow.org/js) | Framework AI chạy trên trình duyệt |
-| [MoveNet SINGLEPOSE_LIGHTNING](https://www.tensorflow.org/hub/tutorials/movenet) | Mô hình pose estimation tốc độ cao (17 keypoints) |
-| [@tensorflow-models/pose-detection](https://github.com/tensorflow/tfjs-models/tree/master/pose-detection) | API phát hiện tư thế người |
-| [Chart.js](https://www.chartjs.org/) | Vẽ biểu đồ thống kê |
+Bạn không cần phải cài đặt bất kỳ phần mềm hay thư viện nào!
 
----
+1. **Cách 1 (Nhanh nhất):** Truy cập trực tiếp link Live Demo:
+   👉 **[https://vietdung29092007-dev.github.io/d-n-b-i-t-p-cu-i-k-/](https://vietdung29092007-dev.github.io/d-n-b-i-t-p-cu-i-k-/)**
 
-## 📐 Thuật toán nhận diện tư thế
-
-Ứng dụng **không** sử dụng model học máy riêng mà phân tích trực tiếp tọa độ 17 điểm keypoint:
-
-```
-        0-mũi
-       / \
-  1-mắt   2-mắt
-  3-tai   4-tai
-  5-vai(T)——6-vai(P)
-  |              |
- 11-hông(T)——12-hông(P)
-```
-
-### Cúi đầu 🙇
-```
-ratio = (vai.y - mũi.y) / rộng_vai
-Phát hiện khi: ratio < 0.5
-```
-*Khi ngồi thẳng, mũi ở cao hơn vai nhiều. Khi cúi, mũi hạ xuống gần vai.*
-
-### Vẹo lưng ↩️
-```
-Cách 1: góc_nghiêng_vai = atan2(|Lvai.y - Pvai.y|, |Lvai.x - Pvai.x|) > 12°
-Cách 2: |trung_tâm_vai.x - trung_tâm_hông.x| / rộng_vai > 30%
-```
-
-### Mắt quá gần 👀
-```
-ratio = rộng_mặt(tai-tai) / rộng_canvas > 40%
-```
-*Khi người dùng lại gần camera, mặt chiếm tỷ lệ lớn hơn trong khung hình.*
+2. **Cách 2 (Chạy ở máy tính cục bộ):**
+   - Tải toàn bộ mã nguồn về máy.
+   - Mở file `index.html` bằng trình duyệt web (Chrome, Edge, Firefox).
+   - *Lưu ý:* Cần kết nối Internet trong lần đầu tiên chạy để trình duyệt tải mô hình AI từ CDN.
 
 ---
 
-## ⚙️ Điều chỉnh ngưỡng phát hiện
+## 📐 Thuật toán Nhận diện (Keypoint Heuristics)
 
-Nếu ứng dụng quá nhạy (cảnh báo sai) hoặc không đủ nhạy, mở `js/config.js` và chỉnh `POSE_THRESHOLDS`:
+Ứng dụng không huấn luyện mô hình phân loại ảnh cồng kềnh, mà trực tiếp phân tích tọa độ hình học của các khớp xương:
 
-```javascript
-const POSE_THRESHOLDS = {
-  headBowRatio: 0.5,         // ↑ tăng = ít nhạy cúi đầu hơn
-  shoulderTiltAngle: 12,     // ↑ tăng = ít nhạy vẹo vai hơn (đơn vị: độ)
-  lateralOffsetRatio: 0.3,   // ↑ tăng = ít nhạy nghiêng người hơn
-  faceCloseRatio: 0.40,      // ↑ tăng = ít nhạy mắt quá gần hơn
-  minKeypointScore: 0.3,     // ↑ tăng = chỉ xét keypoint có độ tin cậy cao hơn
-};
-```
+- 🙇 **Cúi đầu**: Tính tỷ lệ khoảng cách trục Y từ điểm Mũi đến Tâm 2 vai. Nếu quá thấp $\Rightarrow$ Cúi đầu.
+- ↩️ **Vẹo lưng**: Đo góc nghiêng của đường thẳng nối 2 vai so với phương ngang. Góc $> 12^\circ$ $\Rightarrow$ Vẹo lưng.
+- 👀 **Mắt quá gần**: Đo khoảng cách giữa 2 tai. Nếu chiếm quá $40\%$ chiều ngang camera $\Rightarrow$ Mắt quá gần màn hình.
+
+> ⚙️ **Tùy chỉnh độ nhạy:** Có thể chỉnh các thông số này tại file `js/config.js`.
 
 ---
 
-## 📁 Cấu trúc dự án
+## 📁 Cấu trúc Mã nguồn (Modular)
 
-```
+Mã nguồn được viết hoàn toàn bằng Vanilla JavaScript và CSS thuần, được chia nhỏ thành các module cực kỳ dễ bảo trì:
+
+```text
 d-n-b-i-t-p-cu-i-k-/
-├── index.html              ← Giao diện HTML + CDN scripts
-├── style.css               ← Dark theme / AI aesthetic
-├── README.md               ← Tài liệu này
-└── js/                     ← Các module JavaScript
-    ├── config.js            ← Hằng số cấu hình & ngưỡng
-    ├── state.js             ← Biến trạng thái toàn cục
-    ├── pose-classifier.js   ← Thuật toán phân loại tư thế
-    ├── renderer.js          ← Vẽ camera + skeleton
-    ├── ui.js                ← Cập nhật giao diện
-    ├── alert-timer.js       ← Timer cảnh báo 30s + popup
-    ├── stats.js             ← Thống kê phiên
-    ├── charts.js            ← Biểu đồ Chart.js
-    ├── pomodoro.js          ← Pomodoro timer
-    └── app.js               ← Điều phối chính + khởi chạy
+├── index.html            ← Giao diện chính
+├── README.md             ← Tài liệu này
+├── bao_cao.tex           ← Báo cáo chi tiết (LaTeX)
+├── slide.tex             ← Slide thuyết trình (LaTeX Beamer)
+├── css/                  ← (10 Module CSS Giao diện)
+│   ├── variables.css, layout.css, camera.css...
+│   └── ai-loading.css, alert-popup.css...
+└── js/                   ← (10 Module JS Logic)
+    ├── config.js         (Thông số thuật toán)
+    ├── pose-classifier.js(Lõi nhận diện AI)
+    ├── app.js            (Điều phối chính)
+    └── charts.js, pomodoro.js, ui.js...
 ```
 
 ---
 
-## 🎨 Giao diện
+## 📚 Tài liệu Báo Cáo & Slide
 
-- **Dark theme** kiểu AI/Tech với màu neon cyan và xanh lá
-- **3-cột layout**: Camera | Trạng thái + Pomodoro | Biểu đồ
-- **Responsive**: Thu gọn về 2 cột (tablet) và 1 cột (mobile)
-- **Font**: Space Mono (mono/code) + DM Sans (body)
+Dự án bao gồm sẵn mã nguồn tài liệu dành cho việc báo cáo học thuật:
+- **`bao_cao.tex`**: File báo cáo LaTeX chi tiết (5 chương).
+- **`slide.tex`**: File Slide trình chiếu LaTeX Beamer (chuẩn 16:9, Dark theme đồng bộ với ứng dụng).
+
+*Có thể biên dịch các file này thông qua Texmaker hoặc dán vào Overleaf để xuất PDF.*
 
 ---
 
 ## 👤 Tác giả
 
 **Vương Lâm**
-
----
-
-## 📝 Ghi chú kỹ thuật
-
-- Model MoveNet được tải tự động từ CDN khi nhấn "Bắt đầu" (cần internet lần đầu)
-- Ứng dụng dùng **smoothing 5 frame** (majority vote) để tránh kết quả nhấp nháy
-- Camera được hiển thị **mirror flip** (lật ngang) để người dùng thấy tự nhiên như soi gương
-- Skeleton và keypoints được vẽ trực tiếp lên `<canvas>` bằng Canvas 2D API
-- Cảnh báo âm thanh tạo động bằng **Web Audio API** (không cần file âm thanh)
+- **Dự án**: Bài tập cuối kỳ
+- **Công nghệ**: TensorFlow.js, MoveNet, Chart.js, HTML5 Canvas, Web Audio API.
