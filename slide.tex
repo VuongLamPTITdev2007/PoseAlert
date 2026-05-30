@@ -1,15 +1,48 @@
-\documentclass[12pt]{beamer}
+\documentclass[12pt, aspectratio=169]{beamer}
 \usepackage[utf8]{vietnam}
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage{xcolor}
 
+% --- CUSTOM COLORS (PoseAlert Aesthetic) ---
+\definecolor{posedark}{RGB}{17, 24, 39}     % Nền tối (Slate)
+\definecolor{posecyan}{RGB}{0, 212, 255}    % Xanh Cyan
+\definecolor{posegreen}{RGB}{0, 255, 136}   % Xanh Lá
+\definecolor{posealert}{RGB}{255, 71, 87}   % Đỏ cảnh báo
+
+% --- BEAMER THEME SETTINGS ---
 \usetheme{Madrid}
-\usecolortheme{default}
+\useinnertheme{rounded}
+\usecolortheme{orchid}
 
-\title[PoseAlert]{PoseAlert: Ứng dụng Cảnh báo Tư thế Ngồi Học}
-\subtitle{Sử dụng TensorFlow.js và MoveNet}
-\author{Sinh viên: Vương Lâm}
-\institute{Bài Tập Cuối Kỳ}
+% Override màu cho các thành phần Header / Footer
+\setbeamercolor{palette primary}{bg=posedark, fg=white}
+\setbeamercolor{palette secondary}{bg=posedark, fg=posecyan}
+\setbeamercolor{palette tertiary}{bg=posedark, fg=posegreen}
+\setbeamercolor{palette quaternary}{bg=posedark, fg=white}
+
+% Title và Frametitle
+\setbeamercolor{title}{bg=posedark, fg=posegreen}
+\setbeamercolor{frametitle}{bg=posedark, fg=posecyan}
+\setbeamercolor{structure}{fg=posedark}
+
+% Block Colors (Khung viền cong)
+\setbeamercolor{block title}{bg=posedark, fg=posecyan}
+\setbeamercolor{block body}{bg=gray!10, fg=black}
+\setbeamercolor{block title alerted}{bg=posealert, fg=white}
+\setbeamercolor{block body alerted}{bg=posealert!10, fg=black}
+\setbeamercolor{block title example}{bg=posegreen, fg=posedark}
+\setbeamercolor{block body example}{bg=posegreen!10, fg=black}
+
+% Hiệu ứng shadow và dấu chấm
+\setbeamertemplate{itemize items}[circle]
+\setbeamertemplate{blocks}[rounded][shadow=true]
+
+% --- METADATA ---
+\title[PoseAlert AI]{\Huge \textbf{PoseAlert}}
+\subtitle{\vspace{0.2cm}\Large Ứng dụng Cảnh báo Tư thế Ngồi Học\\ \normalsize Dựa trên TensorFlow.js và MoveNet}
+\author{\textbf{Sinh viên:} Vương Lâm}
+\institute{\textbf{Báo cáo Bài Tập Cuối Kỳ}}
 \date{\today}
 
 \begin{document}
@@ -24,98 +57,145 @@
 
 \section{Đặt vấn đề}
 \begin{frame}{1. Đặt vấn đề}
-    \begin{itemize}
-        \item Thời gian ngồi học/làm việc trước màn hình máy tính ngày càng tăng.
-        \vspace{0.3cm}
-        \item Tư thế ngồi sai (cúi gập cổ, vẹo lưng, nhìn sát màn hình) về lâu dài gây các bệnh nghiêm trọng về cột sống và thị lực.
-        \vspace{0.3cm}
-        \item \textbf{Giải pháp cần thiết:} Một công cụ tự động nhắc nhở người dùng điều chỉnh tư thế theo thời gian thực mà không yêu cầu mua sắm thiết bị phần cứng đặc biệt.
-    \end{itemize}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{alertblock}{Thực trạng}
+                \begin{itemize}
+                    \item Thời gian ngồi trước màn hình ngày càng tăng (học tập, làm việc).
+                    \item Tư thế sai (cúi gập cổ, vẹo lưng) gây đau mỏi vai gáy, bệnh cột sống, giảm thị lực.
+                \end{itemize}
+            \end{alertblock}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{exampleblock}{Giải pháp cần thiết}
+                \begin{itemize}
+                    \item Tự động nhắc nhở điều chỉnh tư thế theo thời gian thực.
+                    \item Tiện lợi, dễ tiếp cận, \textbf{không} yêu cầu thiết bị phần cứng đắt tiền.
+                    \item Bảo mật quyền riêng tư cá nhân.
+                \end{itemize}
+            \end{exampleblock}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 \section{Giới thiệu PoseAlert}
 \begin{frame}{2. Giới thiệu PoseAlert}
-    \textbf{PoseAlert} là ứng dụng web nhận diện tư thế qua webcam:
-    \vspace{0.5cm}
+    \textbf{\Large PoseAlert} là ứng dụng web nhận diện tư thế thông minh qua webcam.
+    \vspace{0.4cm}
     \begin{itemize}
-        \item Hoạt động hoàn toàn trên trình duyệt, không gửi video lên máy chủ (đảm bảo quyền riêng tư).
-        \item Nhận diện 4 trạng thái: Ngồi đúng, Cúi đầu, Vẹo lưng, Mắt quá gần màn hình.
-        \item Cảnh báo tự động bằng âm thanh/popup sau 30 giây ngồi sai liên tục.
-        \item Hỗ trợ bộ đếm Pomodoro (25/5 phút) và hệ thống biểu đồ Dashboard báo cáo phiên học.
+        \item \textbf{100\% Client-side}: Xử lý hoàn toàn trên thiết bị của người dùng, không gửi video lên server (Bảo mật tối đa).
+        \item \textbf{4 Trạng thái nhận diện}: Ngồi đúng, Cúi đầu, Vẹo lưng, Mắt quá gần màn hình.
+        \item \textbf{Hệ thống Cảnh báo}: Phát âm thanh và Popup thông báo nếu người dùng ngồi sai liên tục trong 30 giây.
+        \item \textbf{Tính năng bổ sung}: Tích hợp Đồng hồ Pomodoro (25 phút học/5 phút nghỉ) \& Dashboard Thống kê thời gian.
     \end{itemize}
 \end{frame}
 
 \section{Công nghệ sử dụng}
 \begin{frame}{3. Công nghệ sử dụng}
-    \begin{block}{AI \& Machine Learning}
-        \begin{itemize}
-            \item \textbf{TensorFlow.js}: Thực thi mô hình AI trên trình duyệt.
-            \item \textbf{MoveNet (SinglePose Lightning)}: Mô hình trích xuất 17 điểm khớp (keypoints) với tốc độ $\sim 30$ FPS (thời gian thực).
-        \end{itemize}
-    \end{block}
-    
-    \begin{block}{Web Frontend \& Triển khai}
-        \begin{itemize}
-            \item \textbf{HTML/CSS/JS}: Kiến trúc tách module (10 file js).
-            \item \textbf{Chart.js}: Vẽ biểu đồ kết quả trực quan.
-            \item \textbf{Web Audio API}: Tạo âm thanh thông báo.
-            \item \textbf{GitHub Pages}: Triển khai ứng dụng công khai.
-        \end{itemize}
-    \end{block}
+    \begin{columns}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{AI \& Machine Learning}
+                \begin{itemize}
+                    \item \textbf{TensorFlow.js}: Framework chạy mô hình học sâu trực tiếp trên trình duyệt bằng WebGL.
+                    \item \textbf{MoveNet (Lightning)}: Mô hình trích xuất cực nhanh 17 điểm khớp (keypoints) với tốc độ $\sim30$ FPS.
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Web Frontend \& Server}
+                \begin{itemize}
+                    \item \textbf{Vanilla JS}: Cấu trúc mã nguồn tách 10 module độc lập dễ bảo trì.
+                    \item \textbf{Chart.js}: Vẽ biểu đồ kết quả.
+                    \item \textbf{Web Audio API}: Tạo chuông động.
+                    \item \textbf{GitHub Pages}: Triển khai hosting.
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 \section{Kiến trúc \& Thuật toán}
-\begin{frame}{4. Kiến trúc \& Thuật toán (1)}
-    Ứng dụng không huấn luyện phân loại ảnh trực tiếp mà dùng thuật toán \textbf{hình học trên điểm khớp (Keypoint Heuristics)}.
-    \vspace{0.5cm}
-    \begin{itemize}
-        \item \textbf{Phát hiện Cúi đầu:} \\ Tính khoảng cách theo trục Y từ điểm mũi đến tâm đường nối hai vai. Nếu tỷ lệ so với chiều rộng vai $< 0.5 \Rightarrow$ Cúi đầu.
-        \vspace{0.3cm}
-        \item \textbf{Phát hiện Mắt quá gần:} \\ Dùng khoảng cách 2 tai làm ước lượng bề ngang mặt. Nếu chiếm $> 40\%$ bề ngang camera $\Rightarrow$ Quá gần.
-    \end{itemize}
+\begin{frame}{4. Thuật toán: Cúi đầu \& Mắt quá gần}
+    Sử dụng \textbf{Thuật toán hình học trên điểm khớp (Keypoint Heuristics)} thay vì mạng Nơ-ron phân loại ảnh, giúp tốc độ nhanh và dễ cấu hình.
+    \vspace{0.4cm}
+    
+    \begin{columns}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{🙇 Phát hiện Cúi đầu}
+                Tính khoảng cách dọc (trục Y) từ điểm \textbf{Mũi} đến \textbf{Tâm hai vai}. \\
+                Tỷ lệ so với chiều rộng của vai $< 0.5 \Rightarrow$ \textcolor{posealert}{\textbf{Cúi đầu}}.
+            \end{block}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{👀 Phát hiện Mắt quá gần}
+                Dùng khoảng cách 2 \textbf{Tai} làm tham chiếu bề ngang khuôn mặt. \\
+                Nếu chiếm $> 40\%$ bề ngang Camera $\Rightarrow$ \textcolor{posealert}{\textbf{Quá gần}}.
+            \end{block}
+        \end{column}
+    \end{columns}
 \end{frame}
 
-\begin{frame}{4. Kiến trúc \& Thuật toán (2)}
-    \begin{itemize}
-        \item \textbf{Phát hiện Vẹo lưng:} \\ 
-        Góc hợp bởi đường nối hai vai so với phương ngang $> 12^\circ$, hoặc độ lệch tâm giữa trục vai và hông vượt quá $30\%$ $\Rightarrow$ Vẹo lưng.
-        \vspace{0.5cm}
-        \item \textbf{Kỹ thuật Làm mịn (Smoothing):} \\ 
-        Do camera đôi khi nhiễu, ứng dụng lưu 5 khung hình gần nhất và "bầu chọn đa số" (Majority Vote) để chốt kết quả tư thế, giúp giao diện không bị chớp nháy.
-    \end{itemize}
+\begin{frame}{4. Thuật toán: Vẹo lưng \& Kỹ thuật Làm mịn}
+    \begin{block}{↩️ Phát hiện Vẹo lưng}
+        \begin{itemize}
+            \item Góc hợp bởi đường nối hai vai so với phương ngang $> 12^\circ$.
+            \item Hoặc: Độ lệch tâm ngang giữa điểm giữa vai và điểm giữa hông $> 30\%$.
+        \end{itemize}
+    \end{block}
+    
+    \begin{exampleblock}{✨ Kỹ thuật Làm mịn (Smoothing)}
+        \begin{itemize}
+            \item \textbf{Vấn đề:} Camera có thể bị nhiễu (noise) khung hình $\Rightarrow$ Kết quả chớp nháy.
+            \item \textbf{Giải pháp:} Lưu bộ đệm 5 khung hình gần nhất. Áp dụng "Bầu chọn đa số" (Majority Vote) để chốt kết quả tư thế $\Rightarrow$ Ổn định giao diện.
+        \end{itemize}
+    \end{exampleblock}
 \end{frame}
 
 \section{Giao diện và Kết quả}
 \begin{frame}{5. Giao diện và Kết quả}
-    \begin{itemize}
-        \item \textbf{Trải nghiệm người dùng}: Giao diện Dark theme thân thiện mắt, tích hợp khung camera (mirror mode) hiển thị đường vẽ khung xương (skeleton) theo chuyển động thực.
-        \vspace{0.3cm}
-        \item \textbf{Trạng thái trực quan}: Đồng hồ Pomodoro nổi bật và danh sách lịch sử cảnh báo vi phạm trong phiên.
-        \vspace{0.3cm}
-        \item \textbf{Báo cáo Đồ thị}: Tỷ lệ $\%$ thời gian ngồi chuẩn được tóm tắt rõ ràng bằng các biểu đồ của Chart.js.
-    \end{itemize}
+    \begin{columns}
+        \begin{column}{0.48\textwidth}
+            \textbf{Trải nghiệm người dùng:}
+            \begin{itemize}
+                \item Giao diện \textbf{Dark theme} mang phong cách Tech/AI hiện đại.
+                \item Chế độ Gương (Mirror Mode) tự nhiên.
+                \item Vẽ Khung xương (Skeleton) mượt mà bám sát cơ thể.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \textbf{Báo cáo Đồ thị (Dashboard):}
+            \begin{itemize}
+                \item \textbf{Biểu đồ Tròn:} Phân tích Tỷ lệ tư thế trong suốt phiên.
+                \item \textbf{Biểu đồ Đường:} Theo dõi lịch sử tỷ lệ ngồi đúng mỗi 5 giây.
+                \item \textbf{Nhật ký:} Ghi nhận các mốc thời gian vi phạm.
+            \end{itemize}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 \section{Kết luận}
 \begin{frame}{6. Kết luận \& Hướng phát triển}
-    \textbf{Kết quả đạt được:} Xây dựng thành công ứng dụng hỗ trợ sức khỏe linh hoạt, hiệu năng cao, hoàn toàn dựa trên nền tảng web mã nguồn mở.
+    \begin{exampleblock}{Kết quả đạt được}
+        Xây dựng thành công hệ thống tự động cảnh báo tư thế hoạt động trên trình duyệt có tính linh hoạt cao, hiệu năng tốt và bảo vệ sức khỏe người dùng.
+    \end{exampleblock}
     
-    \vspace{0.5cm}
+    \vspace{0.3cm}
     \textbf{Hướng phát triển:}
     \begin{itemize}
-        \item Kết hợp cơ sở dữ liệu (Firebase) lưu trữ biểu đồ sức khỏe qua từng tháng.
-        \item Đóng gói thành tiện ích mở rộng (Browser Extension) nhắc nhở bất kỳ khi nào đang dùng Chrome.
-        \item Khảo sát kết hợp với mô hình nhận diện khung xương 3D chuyên sâu.
+        \item Kết hợp Cơ sở dữ liệu Cloud (Firebase) lưu trữ thống kê theo tháng.
+        \item Đóng gói thành tiện ích trình duyệt (Browser Extension) nhắc nhở liên tục.
+        \item Nâng cấp sử dụng mô hình 3D (MoveNet 3D) đánh giá sâu hơn góc gập cổ.
     \end{itemize}
 \end{frame}
 
 \begin{frame}
     \begin{center}
-        \Huge \textbf{Cảm ơn thầy cô và các bạn đã lắng nghe!}
+        \Huge \textcolor{posecyan}{\textbf{Cảm ơn thầy cô \& các bạn!}}
         
         \vspace{1cm}
-        \large Xin mời xem bản Demo trực tiếp: \\
-        \url{https://vietdung29092007-dev.github.io/d-n-b-i-t-p-cu-i-k-/}
+        \Large \textbf{Live Demo Trực Tiếp:} \\
+        \vspace{0.2cm}
+        \normalsize \url{https://vietdung29092007-dev.github.io/d-n-b-i-t-p-cu-i-k-/}
     \end{center}
 \end{frame}
 
