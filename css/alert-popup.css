@@ -38,6 +38,8 @@
   color: var(--text-secondary);
   margin-bottom: 1.25rem;
   line-height: 1.6;
+  text-align: left;
+  white-space: pre-line;
 }
 
 .alert-box button {

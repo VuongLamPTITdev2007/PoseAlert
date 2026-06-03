@@ -11,6 +11,25 @@
 // Timer đếm ngược
 // ------------------------------------------------------------
 
+const BAD_POSE_ADVICE = {
+  "Cúi đầu": {
+    harm: "gây mỏi cổ, căng cơ cổ và ảnh hưởng xấu đến cột sống cổ.",
+    fix: "giữ đầu thẳng, vai thả lỏng và đặt mắt nhìn thẳng, như tư thế ngồi đúng ban đầu."
+  },
+  "Vẹo lưng": {
+    harm: "làm lệch cột sống, gây đau một bên vai và mỏi lưng dưới.",
+    fix: "đặt hai bàn chân cân bằng, kéo vai về phía sau và giữ lưng thẳng như tư thế ban đầu."
+  },
+  "Mắt quá gần": {
+    harm: "khiến mắt bị mỏi, mờ, khô, rát, lâu ngày dẫn tới cận thị.",
+    fix: "kéo màn hình ra xa hơn, giữ cằm ngang và ngồi thẳng như ban đầu."
+  },
+  default: {
+    harm: "gây căng cơ, mệt mỏi và làm giảm hiệu quả học tập nếu tiếp tục.",
+    fix: "trở về tư thế ngồi đúng ban đầu: lưng thẳng, vai thả lỏng, đầu giữ thẳng và mắt nhìn thẳng."
+  }
+};
+
 /**
  * startBadPoseTimer(poseName)
  * Bắt đầu đếm giây nếu chưa chạy. Sau BAD_POSE_ALERT_SECONDS giây
@@ -86,11 +105,16 @@ function triggerAlert(poseName) {
     const alertMessageEl = document.getElementById("alert-message");
     const alertOverlayEl = document.getElementById("alert-overlay");
     
+    const poseLabel = (poseName || "sai tư thế").toLowerCase();
+    const advice = BAD_POSE_ADVICE[poseName] || BAD_POSE_ADVICE.default;
+    const message =
+      "So với tư thế đúng ban đầu, bạn đang " + poseLabel + " trong " +
+      (BAD_POSE_ALERT_SECONDS || 30) + " giây liên tục.\n\n" +
+      "Tác hại: " + advice.harm + "\n" +
+      "Cách sửa: " + advice.fix;
+
     if (alertTitleEl) alertTitleEl.textContent = "⚠️ Cảnh báo Tư thế!";
-    if (alertMessageEl) {
-      alertMessageEl.textContent = "Bạn đang " + (poseName || "sai tư thế").toLowerCase() +
-        " trong " + (BAD_POSE_ALERT_SECONDS || 30) + " giây liên tục!\nHãy điều chỉnh và ngồi thẳng lưng.";
-    }
+    if (alertMessageEl) alertMessageEl.textContent = message;
     if (alertOverlayEl) alertOverlayEl.classList.remove("hidden");
     
     playAlertSound();
