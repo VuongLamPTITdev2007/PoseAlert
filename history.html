@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PoseAlert — Lịch sử Học tập</title>
+  <meta name="description" content="Xem lịch sử phiên học, streak, và thống kê tư thế ngồi của bạn"/>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/variables.css"/>
+  <link rel="stylesheet" href="css/scrollbar.css"/>
+  <link rel="stylesheet" href="css/navbar.css"/>
+  <link rel="stylesheet" href="css/history.css"/>
+</head>
+<body class="has-navbar">
+
+  <!-- Loading -->
+  <div class="history-loading" id="history-loading">
+    <div class="spinner"></div>
+    <span>Đang tải lịch sử...</span>
+  </div>
+
+  <!-- ========== NỘI DUNG CHÍNH ========== -->
+  <div class="history-page" id="history-content">
+
+    <!-- Header -->
+    <div class="history-header">
+      <h1>📊 Lịch sử Học tập</h1>
+      <p>Theo dõi tiến trình học và cải thiện tư thế ngồi mỗi ngày</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="history-stats-row">
+      <div class="history-stat-card streak-fire" id="streak-fire">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-value" id="streak-current">0</div>
+        <div class="stat-label">Streak hiện tại</div>
+      </div>
+      <div class="history-stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-value" id="streak-longest">0</div>
+        <div class="stat-label">Streak kỷ lục</div>
+      </div>
+      <div class="history-stat-card">
+        <div class="stat-icon">⏱</div>
+        <div class="stat-value" id="total-study-time">0</div>
+        <div class="stat-label">Tổng thời gian học</div>
+      </div>
+    </div>
+
+    <!-- Biểu đồ 30 ngày -->
+    <div class="history-chart-section">
+      <div class="panel-title">📈 Biểu đồ 30 ngày gần đây</div>
+      <div class="chart-container">
+        <canvas id="history-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- Heatmap -->
+    <div class="history-chart-section">
+      <div class="panel-title">🗓 Lịch học tập (30 ngày)</div>
+      <div id="heatmap-container"></div>
+    </div>
+
+    <!-- Bảng lịch sử phiên -->
+    <div class="history-table-section">
+      <div class="panel-title">📝 Lịch sử Phiên học</div>
+      <div id="session-history-table">
+        <div class="history-empty">
+          <span>📝</span>
+          <p>Đang tải...</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========== FIREBASE SDK ========== -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- App JS -->
+  <script src="js/firebase-init.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/presence.js"></script>
+  <script src="js/session-storage.js"></script>
+  <script src="js/history-page.js"></script>
+  <script src="js/navbar.js"></script>
+
+  <script>
+    // Khởi tạo khi đã đăng nhập
+    initAuthListener({
+      requireAuth: true,
+      onAuthReady: (user) => {
+        if (user) {
+          initNavbar();
+          initHistoryPage();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

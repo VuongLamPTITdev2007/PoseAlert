@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PoseAlert — Hướng dẫn Setup Firebase</title>
+  <meta name="description" content="Hướng dẫn từng bước cấu hình Firebase cho PoseAlert"/>
+
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/variables.css"/>
+  <link rel="stylesheet" href="css/scrollbar.css"/>
+  <style>
+    body { padding: 2rem; position: relative; z-index: 1; }
+    .guide {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      animation: slideUp 0.5s ease-out;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .guide h1 {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.5rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    .guide .subtitle {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    .step {
+      margin-bottom: 2rem;
+      padding-left: 2.5rem;
+      position: relative;
+    }
+    .step-num {
+      position: absolute;
+      left: 0; top: 0;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #0099cc);
+      color: var(--bg-main);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .step h2 {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+    .step p, .step li {
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+    .step ul { padding-left: 1.2rem; margin-top: 0.4rem; }
+    .step li { margin-bottom: 0.3rem; }
+    .step a {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+
+    code, .code-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+    }
+    code { padding: 0.15rem 0.4rem; color: var(--accent); }
+    .code-block {
+      display: block;
+      padding: 1rem;
+      margin: 0.7rem 0;
+      overflow-x: auto;
+      line-height: 1.6;
+      white-space: pre;
+      color: var(--text-primary);
+    }
+
+    .warning-box {
+      background: rgba(255, 107, 53, 0.1);
+      border: 1px solid rgba(255, 107, 53, 0.3);
+      border-radius: 10px;
+      padding: 1rem;
+      margin: 1rem 0;
+      color: var(--accent-orange);
+      font-size: 0.85rem;
+    }
+    .success-box {
+      background: rgba(0, 255, 136, 0.08);
+      border: 1px solid rgba(0, 255, 136, 0.25);
+      border-radius: 10px;
+      padding: 1rem;
+      margin: 1rem 0;
+      color: var(--accent-green);
+      font-size: 0.85rem;
+    }
+
+    .config-input-area {
+      margin-top: 1.5rem;
+    }
+    .config-input-area textarea {
+      width: 100%;
+      min-height: 200px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      color: var(--text-primary);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      resize: vertical;
+      outline: none;
+    }
+    .config-input-area textarea:focus {
+      border-color: var(--accent);
+    }
+    .btn-apply {
+      margin-top: 0.7rem;
+      padding: 0.75rem 2rem;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-green), #00cc6a);
+      color: var(--bg-main);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-apply:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--glow-green);
+    }
+    #config-result {
+      margin-top: 0.8rem;
+      font-size: 0.85rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.5rem 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="guide">
+    <a href="index.html" class="back-link">← Quay về trang chính</a>
+
+    <h1>🔥 Hướng dẫn Setup Firebase</h1>
+    <p class="subtitle">Làm theo 6 bước dưới đây để kích hoạt đầy đủ tính năng PoseAlert</p>
+
+    <!-- BƯỚC 1 -->
+    <div class="step">
+      <div class="step-num">1</div>
+      <h2>Tạo Firebase Project</h2>
+      <p>Vào <a href="https://console.firebase.google.com/" target="_blank">Firebase Console</a> → nhấn <strong>"Create a project"</strong> (hoặc "Add project").</p>
+      <ul>
+        <li>Đặt tên: <code>PoseAlert</code> (hoặc tùy ý)</li>
+        <li>Google Analytics: có thể bỏ qua (Disable)</li>
+        <li>Nhấn <strong>"Create project"</strong> → đợi vài giây</li>
+      </ul>
+    </div>
+
+    <!-- BƯỚC 2 -->
+    <div class="step">
+      <div class="step-num">2</div>
+      <h2>Bật Authentication</h2>
+      <p>Trong Firebase Console, chọn project vừa tạo → menu trái → <strong>Build → Authentication</strong></p>
+      <ul>
+        <li>Nhấn <strong>"Get started"</strong></li>
+        <li>Tab <strong>"Sign-in method"</strong> → bật <strong>"Email/Password"</strong></li>
+        <li>Bật thêm <strong>"Google"</strong> → chọn support email → Save</li>
+      </ul>
+    </div>
+
+    <!-- BƯỚC 3 -->
+    <div class="step">
+      <div class="step-num">3</div>
+      <h2>Tạo Cloud Firestore</h2>
+      <p>Menu trái → <strong>Build → Firestore Database</strong> → <strong>"Create database"</strong></p>
+      <ul>
+        <li>Location: chọn <code>asia-southeast1</code> (Singapore, gần VN nhất)</li>
+        <li>Rules: chọn <strong>"Start in test mode"</strong> (cho phép đọc/ghi thoải mái 30 ngày)</li>
+        <li>Nhấn <strong>"Create"</strong></li>
+      </ul>
+      <div class="warning-box">
+        ⚠️ Test mode cho phép ai cũng đọc/ghi được. Sau khi app hoạt động ổn, nên đổi sang rules bảo mật (xem bước 6).
+      </div>
+    </div>
+
+    <!-- BƯỚC 4 -->
+    <div class="step">
+      <div class="step-num">4</div>
+      <h2>Tạo Realtime Database</h2>
+      <p>Menu trái → <strong>Build → Realtime Database</strong> → <strong>"Create Database"</strong></p>
+      <ul>
+        <li>Location: chọn <code>Singapore (asia-southeast1)</code></li>
+        <li>Rules: chọn <strong>"Start in test mode"</strong></li>
+        <li>Nhấn <strong>"Enable"</strong></li>
+      </ul>
+    </div>
+
+    <!-- BƯỚC 5 -->
+    <div class="step">
+      <div class="step-num">5</div>
+      <h2>Lấy Firebase Config</h2>
+      <p>Vào <strong>Project Settings</strong> (biểu tượng ⚙️ ở góc trên trái) → tab <strong>"General"</strong></p>
+      <ul>
+        <li>Cuộn xuống phần <strong>"Your apps"</strong></li>
+        <li>Nếu chưa có app → nhấn biểu tượng <strong>&lt;/&gt;</strong> (Web) để tạo</li>
+        <li>Đặt nickname: <code>PoseAlert Web</code></li>
+        <li>Nhấn <strong>"Register app"</strong></li>
+        <li>Firebase sẽ hiện đoạn config → <strong>copy toàn bộ</strong></li>
+      </ul>
+      <p>Config sẽ trông giống như thế này:</p>
+      <div class="code-block">const firebaseConfig = {
+  apiKey: "AIzaSy...........................",
+  authDomain: "posealert-xxxxx.firebaseapp.com",
+  projectId: "posealert-xxxxx",
+  storageBucket: "posealert-xxxxx.appspot.com",
+  messagingSenderId: "123456789012",
+  appId: "1:123456789012:web:abcdef123456",
+  databaseURL: "https://posealert-xxxxx-default-rtdb.asia-southeast1.firebasedatabase.app"
+};</div>
+
+      <div class="warning-box">
+        ⚠️ <strong>databaseURL</strong> có thể không có sẵn trong config. Hãy copy nó từ trang Realtime Database (ở thanh URL phía trên data).
+      </div>
+    </div>
+
+    <!-- BƯỚC 5b: Paste config -->
+    <div class="step">
+      <div class="step-num">⚡</div>
+      <h2>Paste Config vào đây</h2>
+      <p>Dán đoạn config từ Firebase Console vào ô bên dưới. Tool sẽ tự trích xuất các giá trị cần thiết và tạo nội dung file cho bạn.</p>
+
+      <div class="config-input-area">
+        <textarea id="config-paste" placeholder='Dán đoạn firebaseConfig từ Firebase Console vào đây...
+
+Ví dụ:
+const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "xxx.firebaseapp.com",
+  ...
+};'></textarea>
+        <button class="btn-apply" onclick="parseConfig()">⚡ Trích xuất Config</button>
+        <div id="config-result"></div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- BƯỚC 6 -->
+    <div class="step">
+      <div class="step-num">6</div>
+      <h2>Mở file <code>js/firebase-init.js</code> và dán config</h2>
+      <p>Mở file <code>js/firebase-init.js</code> trong editor → thay thế các giá trị <code>"YOUR_..."</code> bằng config thật.</p>
+      <p>Nội dung đã trích xuất (nếu có) sẽ hiện ở trên. Copy và dán vào file.</p>
+    </div>
+
+    <div class="success-box">
+      ✅ Sau khi điền config xong, refresh trang <strong>index.html</strong> — banner cảnh báo sẽ biến mất và tất cả tính năng sẽ hoạt động!
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="step">
+      <div class="step-num">🔒</div>
+      <h2>Firestore Security Rules (tùy chọn, nên làm sau)</h2>
+      <p>Khi app đã hoạt động ổn, vào <strong>Firestore → Rules</strong> và dán:</p>
+      <div class="code-block">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users: chỉ đọc/ghi profile của mình
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    // Sessions: chỉ đọc/ghi phiên của mình
+    match /sessions/{sessionId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+    }
+    // Friends: cả 2 user liên quan đều đọc/ghi được
+    match /friends/{friendId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null;
+    }
+    // Study Rooms: ai cũng đọc/tạo được, chỉ members mới sửa
+    match /study_rooms/{roomId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+    }
+  }
+}</div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">🔒</div>
+      <h2>Realtime Database Rules (tùy chọn)</h2>
+      <p>Vào <strong>Realtime Database → Rules</strong> và dán:</p>
+      <div class="code-block">{
+  "rules": {
+    "status": {
+      "$uid": {
+        ".read": true,
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "chats": {
+      "$roomId": {
+        "messages": {
+          ".read": "auth != null",
+          ".write": "auth != null",
+          ".indexOn": ["sentAt"]
+        },
+        "typing": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        }
+      }
+    }
+  }
+}</div>
+    </div>
+
+  </div>
+
+  <script>
+    function parseConfig() {
+      const input = document.getElementById("config-paste").value;
+      const result = document.getElementById("config-result");
+
+      if (!input.trim()) {
+        result.innerHTML = '<div class="warning-box">Vui lòng dán config vào ô trên.</div>';
+        return;
+      }
+
+      try {
+        // Trích xuất các giá trị từ input
+        const extract = (key) => {
+          const regex = new RegExp(key + '\\s*:\\s*["\']([^"\']+)["\']');
+          const match = input.match(regex);
+          return match ? match[1] : null;
+        };
+
+        const config = {
+          apiKey: extract("apiKey"),
+          authDomain: extract("authDomain"),
+          projectId: extract("projectId"),
+          storageBucket: extract("storageBucket"),
+          messagingSenderId: extract("messagingSenderId"),
+          appId: extract("appId"),
+          databaseURL: extract("databaseURL"),
+        };
+
+        // Kiểm tra tối thiểu
+        if (!config.apiKey || !config.projectId) {
+          result.innerHTML = '<div class="warning-box">❌ Không tìm thấy apiKey hoặc projectId. Hãy chắc chắn bạn đã dán đúng config.</div>';
+          return;
+        }
+
+        // Tạo output
+        const output = `const firebaseConfig = {
+  apiKey:            "${config.apiKey}",
+  authDomain:        "${config.authDomain || config.projectId + '.firebaseapp.com'}",
+  projectId:         "${config.projectId}",
+  storageBucket:     "${config.storageBucket || config.projectId + '.appspot.com'}",
+  messagingSenderId: "${config.messagingSenderId || ''}",
+  appId:             "${config.appId || ''}",
+  databaseURL:       "${config.databaseURL || 'https://' + config.projectId + '-default-rtdb.asia-southeast1.firebasedatabase.app'}",
+};`;
+
+        result.innerHTML = `
+          <div class="success-box">✅ Config đã trích xuất thành công!</div>
+          <p style="color:var(--text-secondary);font-size:0.82rem;margin:0.5rem 0;">
+            Copy đoạn dưới đây → mở <code>js/firebase-init.js</code> → thay thế phần <code>firebaseConfig</code>:
+          </p>
+          <div class="code-block" style="position:relative;">
+            <button onclick="navigator.clipboard.writeText(this.nextElementSibling.textContent).then(()=>this.textContent='✅ Đã copy!')" style="
+              position:absolute;top:0.5rem;right:0.5rem;
+              background:var(--accent);color:var(--bg-main);border:none;border-radius:6px;
+              padding:0.3rem 0.7rem;font-size:0.72rem;cursor:pointer;font-weight:700;">📋 Copy</button>
+            <span>${output.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
+          </div>
+        `;
+      } catch (err) {
+        result.innerHTML = '<div class="warning-box">❌ Lỗi parse config: ' + err.message + '</div>';
+      }
+    }
+  </script>
+</body>
+</html>

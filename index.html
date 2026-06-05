@@ -11,6 +11,7 @@
   <!-- Thư viện CSS -->
   <!-- ===== CÁC MODULE CSS ===== -->
   <link rel="stylesheet" href="css/variables.css"/>
+  <link rel="stylesheet" href="css/navbar.css"/>
   <link rel="stylesheet" href="css/layout.css"/>
   <link rel="stylesheet" href="css/camera.css"/>
   <link rel="stylesheet" href="css/controls.css"/>
@@ -21,7 +22,7 @@
   <link rel="stylesheet" href="css/scrollbar.css"/>
   <link rel="stylesheet" href="css/ai-loading.css"/>
 </head>
-<body>
+<body class="has-navbar">
 
   <!-- ========== POPUP CẢNH BÁO ========== -->
   <div id="alert-overlay" class="alert-overlay hidden">
@@ -183,6 +184,12 @@
   </main>
 
   <!-- ========== THƯ VIỆN ========== -->
+  <!-- Firebase SDK (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
   <!-- TensorFlow.js + MoveNet Pose Detection -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
@@ -190,6 +197,11 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
   <!-- ===== CÁC MODULE JS (theo thứ tự phụ thuộc) ===== -->
+  <script src="js/firebase-init.js"></script>   <!-- 0. Firebase khởi tạo -->
+  <script src="js/auth.js"></script>            <!-- 0b. Xác thực người dùng -->
+  <script src="js/presence.js"></script>        <!-- 0c. Theo dõi online/offline -->
+  <script src="js/session-storage.js"></script> <!-- 0d. Lưu phiên học lên Firestore -->
+  <script src="js/navbar.js"></script>          <!-- 0e. Thanh điều hướng -->
   <script src="js/config.js"></script>          <!-- 1. Hằng số cấu hình -->
   <script src="js/state.js"></script>           <!-- 2. Biến trạng thái toàn cục -->
   <script src="js/pose-classifier.js"></script> <!-- 3. Thuật toán phân loại tư thế -->

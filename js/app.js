@@ -113,6 +113,10 @@ async function startApp() {
     poseHistory = [];
     isRunning   = true;
     updateStatus("Đang nhận diện...", "active");
+
+    // Cập nhật trạng thái "đang học" trên Firebase
+    if (currentUser) setUserStudying(currentUser.uid, true);
+
     window.requestAnimationFrame(predictionLoop);
 
   } catch (err) {
@@ -155,7 +159,13 @@ async function startApp() {
 function stopApp() {
   isRunning = false;
 
-  // Giải phóng camera
+  // Lưu phiên học lên Firestore trước khi reset
+  if (typeof saveSessionToFirestore === "function") {
+    saveSessionToFirestore();
+  }
+
+  // Cập nhật trạng thái về "online" (không còn "studying")
+  if (currentUser) setUserStudying(currentUser.uid, false);
   if (mediaStream) {
     mediaStream.getTracks().forEach(track => track.stop());
     mediaStream = null;
@@ -283,6 +293,16 @@ document.addEventListener("DOMContentLoaded", () => {
   try {
     initCharts();          // Vẽ biểu đồ trống để giao diện không bị trống
     updatePomodoroDisplay(); // Hiển thị đồng hồ Pomodoro ban đầu (25:00)
+
+    // Khởi tạo Auth listener + Navbar
+    initAuthListener({
+      requireAuth: true,
+      onAuthReady: (user) => {
+        if (user) {
+          initNavbar();
+        }
+      }
+    });
 
     console.log("🚀 PoseAlert đã khởi động! (MoveNet Pose Estimation)");
     console.log("📋 Nhấn 'Bắt đầu' để sử dụng — không cần URL model!");
