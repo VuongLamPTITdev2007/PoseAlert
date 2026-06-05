@@ -1,26 +1,18 @@
 /* ================================================
    firebase-config.js — Cấu hình kết nối Firebase
-   ================================================
-   
-   HƯỚNG DẪN: Bạn cần tạo Firebase Project miễn phí tại https://console.firebase.google.com/
-   rồi thay thế các giá trị bên dưới bằng thông tin project của bạn.
-   
-   Bước 1: Truy cập https://console.firebase.google.com/
-   Bước 2: Nhấn "Add project" → đặt tên (VD: "posealert")
-   Bước 3: Vào Project Settings → General → cuộn xuống "Your apps" → nhấn biểu tượng Web (</>)
-   Bước 4: Đặt tên app → Register → Copy firebaseConfig
-   Bước 5: Bật Authentication → Sign-in method → Google → Enable
-   Bước 6: Bật Realtime Database → Create Database → Start in test mode
-*/
+   ================================================ */
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyCvWaGIFm40EA0flXXyua6WxZaYNaVCmcs",
+  authDomain: "posealert-c38d4.firebaseapp.com",
+  // Nếu bạn chọn Location là Singapore, URL sẽ có dạng asia-southeast1
+  // Nếu bạn chọn US (mặc định), URL sẽ là: https://posealert-c38d4-default-rtdb.firebaseio.com
+  databaseURL: "https://posealert-c38d4-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "posealert-c38d4",
+  storageBucket: "posealert-c38d4.firebasestorage.app",
+  messagingSenderId: "134096274436",
+  appId: "1:134096274436:web:b2b80cb21b4748edfca151",
+  measurementId: "G-MY95J6KP75"
 };
 
 // Khởi tạo Firebase
@@ -32,4 +24,4 @@ const db = firebase.database();
 const googleProvider = new firebase.auth.GoogleAuthProvider();
 
 // Kiểm tra config hợp lệ
-const isFirebaseConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY";
+const isFirebaseConfigured = true;
