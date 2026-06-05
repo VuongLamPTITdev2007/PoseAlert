@@ -48,4 +48,10 @@ let pomodoroIsWork    = true;  // true = học, false = nghỉ
 let pomodoroIsRunning = false;
 let pomodoroCycles    = 0;
 // chế độ ẩn danh người dùng ( chỉ hiện khung vẽ)
-let isPrivacyMode = false; 
+let isPrivacyMode = false;
+
+// ---- Firebase session tracking ----
+let sessionStartTime = null;   // Date.now() khi nhấn Bắt đầu
+let poseCounts = { good: 0, bad1: 0, bad2: 0, bad3: 0 };
+let alertCount = 0;
+let pomoCycles = 0;

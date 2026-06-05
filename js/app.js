@@ -115,7 +115,8 @@ async function startApp() {
     updateStatus("Đang nhận diện...", "active");
 
     // Cập nhật trạng thái "đang học" trên Firebase
-    if (currentUser) setUserStudying(currentUser.uid, true);
+    updateOnlineStatus('studying', 'Đang tập trung');
+    sessionStartTime = Date.now();
 
     window.requestAnimationFrame(predictionLoop);
 
@@ -159,13 +160,11 @@ async function startApp() {
 function stopApp() {
   isRunning = false;
 
-  // Lưu phiên học lên Firestore trước khi reset
-  if (typeof saveSessionToFirestore === "function") {
-    saveSessionToFirestore();
-  }
+  // Lưu phiên học lên Firebase trước khi reset
+  autoSaveSession();
 
   // Cập nhật trạng thái về "online" (không còn "studying")
-  if (currentUser) setUserStudying(currentUser.uid, false);
+  updateOnlineStatus('online', 'Rảnh');
   if (mediaStream) {
     mediaStream.getTracks().forEach(track => track.stop());
     mediaStream = null;
@@ -218,6 +217,13 @@ async function predict() {
       const raw      = classifyPose(poses[0].keypoints);
       const smoothed = smoothPoseResult(raw);
       updateUI(buildPrediction(smoothed));
+
+      // Đồng bộ trạng thái tư thế lên phòng học ảo
+      const isGood = smoothed.name === 'Ngồi đúng ✅';
+      updateOnlineStatus(
+        isGood ? 'studying' : 'warning',
+        smoothed.name
+      );
     }
   } catch (err) {
     console.error("❌ Lỗi trong vòng lặp nhận diện:", err);
@@ -291,18 +297,9 @@ window.addEventListener("unhandledrejection", (event) => {
 
 document.addEventListener("DOMContentLoaded", () => {
   try {
-    initCharts();          // Vẽ biểu đồ trống để giao diện không bị trống
-    updatePomodoroDisplay(); // Hiển thị đồng hồ Pomodoro ban đầu (25:00)
-
-    // Khởi tạo Auth listener + Navbar
-    initAuthListener({
-      requireAuth: true,
-      onAuthReady: (user) => {
-        if (user) {
-          initNavbar();
-        }
-      }
-    });
+    initCharts();            // Vẽ biểu đồ trống
+    updatePomodoroDisplay(); // Hiển thị Pomodoro ban đầu (25:00)
+    initAuth();              // Khởi tạo Firebase Auth listener
 
     console.log("🚀 PoseAlert đã khởi động! (MoveNet Pose Estimation)");
     console.log("📋 Nhấn 'Bắt đầu' để sử dụng — không cần URL model!");

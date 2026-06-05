@@ -1,186 +1,102 @@
-/**
- * ============================================================
- *  PoseAlert — js/chat.js
- *  Chat realtime dùng Firebase Realtime Database
- *  Phụ thuộc: firebase-init.js, auth.js
- * ============================================================
- */
+/* ================================================
+   chat.js — Chat nhắn tin trong Phòng học ảo
+   ================================================ */
 
-// Listener hiện tại (để dọn dẹp khi chuyển phòng)
-let _currentChatListener = null;
-let _currentChatRoomId   = null;
+let chatRef = null;
+const MAX_MESSAGES = 50;
 
-// ============================================================
-// GỬI TIN NHẮN
-// ============================================================
+/* ---------- GỬI TIN NHẮN ---------- */
+function sendChatMessage() {
+  if (!currentUser || !currentRoomId || !isFirebaseConfigured) return;
 
-/**
- * sendMessage(roomId, text)
- * Gửi tin nhắn vào phòng chat.
- */
-function sendMessage(roomId, text) {
-  if (!currentUser || !text.trim()) return;
+  const input = document.getElementById('chat-input');
+  if (!input) return;
 
-  const messageData = {
-    senderUid:  currentUser.uid,
-    senderName: currentUser.displayName || "User",
-    senderAvatar: currentUser.photoURL || "",
-    text: text.trim(),
-    sentAt: firebase.database.ServerValue.TIMESTAMP,
-  };
+  const text = input.value.trim();
+  if (!text) return;
 
-  rtdb.ref("chats/" + roomId + "/messages").push(messageData);
-}
-
-// ============================================================
-// LẮNG NGHE TIN NHẮN (REALTIME)
-// ============================================================
-
-/**
- * listenMessages(roomId, callback)
- * Lắng nghe tin nhắn mới trong phòng.
- * callback(message) được gọi mỗi khi có tin nhắn mới.
- */
-function listenMessages(roomId, callback) {
-  // Dọn dẹp listener cũ
-  stopListeningMessages();
-
-  _currentChatRoomId = roomId;
-  const ref = rtdb.ref("chats/" + roomId + "/messages")
-    .orderByChild("sentAt")
-    .limitToLast(100);
-
-  _currentChatListener = ref.on("child_added", (snapshot) => {
-    const msg = snapshot.val();
-    if (msg) {
-      callback({
-        id: snapshot.key,
-        ...msg,
-        isOwn: currentUser && msg.senderUid === currentUser.uid,
-      });
-    }
+  db.ref(`rooms/${currentRoomId}/chat`).push({
+    uid: currentUser.uid,
+    name: currentUser.displayName || 'Ẩn danh',
+    avatar: currentUser.photoURL || '',
+    text: text,
+    timestamp: firebase.database.ServerValue.TIMESTAMP
   });
 
-  return _currentChatListener;
+  input.value = '';
+  input.focus();
 }
 
-/**
- * stopListeningMessages()
- * Dừng lắng nghe tin nhắn.
- */
-function stopListeningMessages() {
-  if (_currentChatRoomId) {
-    rtdb.ref("chats/" + _currentChatRoomId + "/messages").off();
-    _currentChatListener = null;
-    _currentChatRoomId   = null;
-  }
+/* ---------- LẮNG NGHE TIN NHẮN ---------- */
+function listenToChat(roomId) {
+  // Tắt listener cũ
+  if (chatRef) chatRef.off();
+
+  chatRef = db.ref(`rooms/${roomId}/chat`).orderByChild('timestamp').limitToLast(MAX_MESSAGES);
+
+  chatRef.on('child_added', (snapshot) => {
+    const msg = snapshot.val();
+    appendChatMessage(msg);
+  });
 }
 
-// ============================================================
-// HIỂN THỊ TIN NHẮN TRÊN UI
-// ============================================================
+/* ---------- HIỂN THỊ TIN NHẮN ---------- */
+function appendChatMessage(msg) {
+  const container = document.getElementById('chat-messages');
+  if (!container) return;
 
-/**
- * renderMessage(msg, containerEl)
- * Render 1 tin nhắn vào container.
- */
-function renderMessage(msg, containerEl) {
-  if (!containerEl) return;
+  // Xóa placeholder "Chưa có tin nhắn"
+  const empty = container.querySelector('.log-empty');
+  if (empty) empty.remove();
 
-  const div = document.createElement("div");
-  div.className = "chat-message" + (msg.isOwn ? " own" : "");
+  const isMe = currentUser && msg.uid === currentUser.uid;
+  const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '';
 
-  const time = msg.sentAt
-    ? new Date(msg.sentAt).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })
-    : "";
-
+  const div = document.createElement('div');
+  div.className = `chat-msg ${isMe ? 'chat-msg-me' : ''}`;
   div.innerHTML = `
-    <div class="chat-msg-header">
-      ${msg.senderAvatar ? `<img src="${msg.senderAvatar}" class="chat-avatar" alt=""/>` : `<div class="chat-avatar-placeholder">${(msg.senderName || "U")[0]}</div>`}
-      <span class="chat-sender">${_escapeHtml(msg.senderName || "User")}</span>
-      <span class="chat-time">${time}</span>
+    <img class="chat-avatar" src="${msg.avatar || ''}" alt="" onerror="this.style.display='none'"/>
+    <div class="chat-bubble">
+      <div class="chat-meta">
+        <span class="chat-name">${msg.name}</span>
+        <span class="chat-time">${time}</span>
+      </div>
+      <div class="chat-text">${escapeHtml(msg.text)}</div>
     </div>
-    <div class="chat-msg-body">${_escapeHtml(msg.text)}</div>
   `;
 
-  containerEl.appendChild(div);
+  container.appendChild(div);
 
-  // Auto-scroll xuống
-  containerEl.scrollTop = containerEl.scrollHeight;
-}
+  // Tự cuộn xuống cuối
+  container.scrollTop = container.scrollHeight;
 
-/**
- * setupChatInput(roomId, inputEl, sendBtnEl)
- * Gắn event cho ô nhập tin nhắn và nút gửi.
- */
-function setupChatInput(roomId, inputEl, sendBtnEl) {
-  if (!inputEl) return;
-
-  const send = () => {
-    const text = inputEl.value.trim();
-    if (text) {
-      sendMessage(roomId, text);
-      inputEl.value = "";
-      inputEl.focus();
-    }
-  };
-
-  // Gửi bằng Enter
-  inputEl.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      send();
-    }
-  });
-
-  // Gửi bằng nút
-  if (sendBtnEl) {
-    sendBtnEl.addEventListener("click", send);
+  // Giới hạn số tin nhắn hiển thị
+  while (container.children.length > MAX_MESSAGES) {
+    container.removeChild(container.firstChild);
   }
 }
 
-// ============================================================
-// TYPING INDICATOR (tùy chọn)
-// ============================================================
-
-/**
- * setTyping(roomId, isTyping)
- * Báo cho phòng biết mình đang gõ.
- */
-function setTyping(roomId, isTyping) {
-  if (!currentUser) return;
-  const ref = rtdb.ref("chats/" + roomId + "/typing/" + currentUser.uid);
-  if (isTyping) {
-    ref.set({ name: currentUser.displayName, timestamp: firebase.database.ServerValue.TIMESTAMP });
-    // Auto-remove sau 5 giây
-    ref.onDisconnect().remove();
-    setTimeout(() => ref.remove(), 5000);
-  } else {
-    ref.remove();
+/* ---------- XỬ LÝ PHÍM ENTER ---------- */
+function handleChatKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendChatMessage();
   }
 }
 
-/**
- * listenTyping(roomId, callback)
- * Lắng nghe ai đang gõ.
- * callback(typingUsers) → array of { uid, name }.
- */
-function listenTyping(roomId, callback) {
-  rtdb.ref("chats/" + roomId + "/typing").on("value", (snapshot) => {
-    const data = snapshot.val() || {};
-    const typingUsers = Object.entries(data)
-      .filter(([uid]) => uid !== (currentUser && currentUser.uid))
-      .map(([uid, val]) => ({ uid, name: val.name }));
-    callback(typingUsers);
-  });
-}
-
-// ============================================================
-// TIỆN ÍCH
-// ============================================================
-
-function _escapeHtml(text) {
-  const div = document.createElement("div");
+/* ---------- ESCAPE HTML ---------- */
+function escapeHtml(text) {
+  const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+/* ---------- KHỞI TẠO CHAT ---------- */
+function initChat(roomId) {
+  listenToChat(roomId);
+
+  const input = document.getElementById('chat-input');
+  if (input) {
+    input.addEventListener('keydown', handleChatKeydown);
+  }
 }
