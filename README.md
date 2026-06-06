@@ -13,9 +13,12 @@
 - 🤖 **Nhận diện AI Thời gian thực**: Tích hợp mô hình `MoveNet (Lightning)` cực nhanh, quét 17 điểm khớp trên cơ thể.
 - 🎯 **Phân tích 4 Tư thế**: Nhận diện chuẩn xác *Ngồi đúng*, *Cúi đầu*, *Vẹo lưng*, và *Mắt quá gần*.
 - ⚠️ **Hệ thống Cảnh báo Thông minh**: Tự động phát âm thanh chuông và hiển thị popup nếu giữ tư thế sai liên tục trong 30 giây.
+- ☁️ **Lưu trữ Đám mây (Firebase)**: Đăng nhập Google, đồng bộ lịch sử học tập, phòng học ảo (virtual room) và live chat với bạn bè.
+- 🎮 **Gamification (Trò chơi hóa)**: Hệ thống Chuỗi Lửa (Streak) và Nhiệm vụ hàng ngày (Daily Quests) giúp duy trì động lực học tập.
+- 📱 **Thiết kế Responsive**: Trải nghiệm giao diện app chuyên nghiệp mượt mà trên cả máy tính và điện thoại di động.
 - 🍅 **Pomodoro Timer**: Tích hợp đồng hồ đếm ngược 25 phút làm việc / 5 phút nghỉ ngơi giúp duy trì sự tập trung.
 - 📊 **Dashboard Thống kê**: Biểu đồ hình tròn và biểu đồ đường phân tích tỷ lệ tư thế chuẩn trong suốt phiên học.
-- 🔒 **Bảo mật Quyền riêng tư**: Camera không bao giờ được ghi lại hay gửi lên bất kỳ máy chủ nào. Mọi xử lý đều diễn ra ngay trên máy của bạn.
+- 🔒 **Bảo mật Quyền riêng tư**: Camera không bao giờ được ghi lại. Ảnh được phân tích trực tiếp ngay trên máy của bạn (Client-side).
 
 ---
 
