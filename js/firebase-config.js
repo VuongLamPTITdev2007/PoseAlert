@@ -5,9 +5,7 @@
 const firebaseConfig = {
   apiKey: "AIzaSyCvWaGIFm40EA0flXXyua6WxZaYNaVCmcs",
   authDomain: "posealert-c38d4.firebaseapp.com",
-  // Nếu bạn chọn Location là Singapore, URL sẽ có dạng asia-southeast1
-  // Nếu bạn chọn US (mặc định), URL sẽ là: https://posealert-c38d4-default-rtdb.firebaseio.com
-  databaseURL: "https://posealert-c38d4-default-rtdb.asia-southeast1.firebasedatabase.app",
+  databaseURL: "https://posealert-c38d4-default-rtdb.firebaseio.com",
   projectId: "posealert-c38d4",
   storageBucket: "posealert-c38d4.firebasestorage.app",
   messagingSenderId: "134096274436",
