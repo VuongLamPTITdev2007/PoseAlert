@@ -281,16 +281,38 @@ body::before {
 }
 
 @media (max-width: 640px) {
-  .app-shell { flex-direction: column; }
+  body {
+    overflow-y: auto; /* Cho phép cuộn trang trên mobile */
+  }
+  .app-shell { 
+    flex-direction: column; 
+    height: auto;
+    overflow: visible;
+  }
   .sidebar {
     width: 100%;
     height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
     overflow: visible;
     border-right: none;
     border-bottom: 1px solid var(--border);
   }
-  .sidebar-section { flex: 1; min-width: 200px; }
-  .main-content { height: calc(100vh - 300px); }
+  .sidebar-logo {
+    justify-content: center; /* Căn giữa logo trên mobile */
+  }
+  .main-content { 
+    height: auto; 
+    overflow: visible; 
+  }
+  .dashboard-grid { 
+    padding: 0.75rem; 
+    gap: 0.75rem;
+    overflow: visible; 
+  }
+  .topbar {
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
 }
