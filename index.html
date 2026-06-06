@@ -183,63 +183,65 @@
       </div>
     </section>
 
+    <!-- CỘT THỨ 4: Phòng Học Ảo + Lịch sử Cloud (hiện khi đăng nhập) -->
+    <section class="panel community-panel hidden" id="network-panel">
+
+      <!-- TAB HEADER -->
+      <div class="community-tabs">
+        <div class="community-tab active" onclick="switchCommunityTab('room')">🌐 Phòng học</div>
+        <div class="community-tab" onclick="switchCommunityTab('history')">📚 Lịch sử</div>
+      </div>
+
+      <!-- TAB 1: PHÒNG HỌC ẢO -->
+      <div class="community-pane active" id="pane-room">
+        <div class="room-header">
+          <span class="room-name" id="room-name">📖 Phòng: general</span>
+          <span class="online-badge"><span id="online-count">0</span> online</span>
+        </div>
+
+        <div class="member-list" id="member-list">
+          <p class="log-empty">Chưa có ai trong phòng...</p>
+        </div>
+
+        <div class="panel-title" style="font-size:0.75rem; margin-top:0.5rem;">💬 Chat</div>
+        <div class="chat-container" style="flex:1;">
+          <div class="chat-messages" id="chat-messages">
+            <p class="log-empty">Chưa có tin nhắn...</p>
+          </div>
+          <div class="chat-input-wrap">
+            <input type="text" class="chat-input" id="chat-input" placeholder="Nhắn tin..." maxlength="200"/>
+            <button class="btn-send" onclick="sendChatMessage()">&#x27A4;</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: LỊCH SỬ HỌC TẬP -->
+      <div class="community-pane" id="pane-history">
+        <div class="weekly-summary">
+          <div class="weekly-card">
+            <div class="weekly-num" id="weekly-total-minutes">0</div>
+            <div class="weekly-label">⏱ Phút tuần này</div>
+          </div>
+          <div class="weekly-card">
+            <div class="weekly-num" id="weekly-avg-posture">0%</div>
+            <div class="weekly-label">🎯 TB Tư thế đúng</div>
+          </div>
+          <div class="weekly-card">
+            <div class="weekly-num" id="weekly-sessions">0</div>
+            <div class="weekly-label">📅 Số phiên</div>
+          </div>
+        </div>
+
+        <div class="panel-title" style="font-size:0.75rem;">🕐 Các phiên gần đây</div>
+        <div class="study-history-list" id="study-history-list">
+          <p class="log-empty">Chưa có phiên học tập nào...</p>
+        </div>
+      </div>
+
+    </section>
+
   </main>
 
-  <!-- ========== KHU VỰC MẠNG LƯỚI (Phòng học ảo + Chat + Lịch sử) ========== -->
-  <section class="network-section hidden" id="network-panel">
-
-    <!-- Panel trái: Phòng học ảo + Thành viên -->
-    <div class="panel">
-      <div class="panel-title">🌐 Phòng Học Ảo</div>
-
-      <div class="room-header">
-        <span class="room-name" id="room-name">📖 Phòng: general</span>
-        <span class="online-badge">
-          <span id="online-count">0</span> online
-        </span>
-      </div>
-
-      <!-- Danh sách thành viên -->
-      <div class="member-list" id="member-list">
-        <p class="log-empty">Đăng nhập để thấy bạn bè...</p>
-      </div>
-
-      <!-- Khung Chat -->
-      <div class="panel-title" style="margin-top:1rem; font-size:0.8rem;">💬 Chat</div>
-      <div class="chat-container">
-        <div class="chat-messages" id="chat-messages">
-          <p class="log-empty">Chưa có tin nhắn...</p>
-        </div>
-        <div class="chat-input-wrap">
-          <input type="text" class="chat-input" id="chat-input" placeholder="Nhắn tin..." maxlength="200"/>
-          <button class="btn-send" onclick="sendChatMessage()">➤</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Panel phải: Lịch sử học tập Cloud -->
-    <div class="panel">
-      <div class="panel-title">📚 Lịch sử Học tập (Cloud)</div>
-
-      <!-- Tổng hợp tuần -->
-      <div class="weekly-summary">
-        <div class="weekly-card">
-          <div class="weekly-num" id="weekly-total-minutes">0</div>
-          <div class="weekly-label">⏱ Phút tuần này</div>
-        </div>
-        <div class="weekly-card">
-          <div class="weekly-num" id="weekly-avg-posture">0%</div>
-          <div class="weekly-label">🎯 TB Tư thế đúng</div>
-        </div>
-        <div class="weekly-card">
-          <div class="weekly-num" id="weekly-sessions">0</div>
-          <div class="weekly-label">📅 Số phiên</div>
-        </div>
-      </div>
-
-      <!-- Danh sách phiên gần nhất -->
-      <div class="panel-title" style="margin-top:0.5rem; font-size:0.8rem;">🕐 Các phiên gần đây</div>
-      <div class="study-history-list" id="study-history-list">
         <p class="log-empty">Chưa có phiên học tập nào...</p>
       </div>
     </div>

@@ -58,29 +58,31 @@ function initAuth() {
 
 /* ---------- CẬP NHẬT UI KHI ĐĂNG NHẬP ---------- */
 function onAuthSuccess(user) {
-  const authSection = document.getElementById('auth-section');
   const btnSignIn = document.getElementById('btn-sign-in');
-  const userInfo = document.getElementById('user-info');
-  const userName = document.getElementById('user-name');
+  const userInfo  = document.getElementById('user-info');
+  const userName  = document.getElementById('user-name');
   const userAvatar = document.getElementById('user-avatar');
 
-  if (btnSignIn) btnSignIn.classList.add('hidden');
-  if (userInfo) userInfo.classList.remove('hidden');
-  if (userName) userName.textContent = user.displayName || 'Người dùng';
+  if (btnSignIn)  btnSignIn.classList.add('hidden');
+  if (userInfo)   userInfo.classList.remove('hidden');
+  if (userName)   userName.textContent = user.displayName || 'Người dùng';
   if (userAvatar) {
     userAvatar.src = user.photoURL || '';
     userAvatar.alt = user.displayName || '';
   }
 
-  // Hiện các panel online
+  // Hiện cột thứ 4 + thêm lưới 4 cột
   const networkPanel = document.getElementById('network-panel');
+  const mainGrid     = document.querySelector('.main-grid');
   if (networkPanel) networkPanel.classList.remove('hidden');
+  if (mainGrid)     mainGrid.classList.add('has-community');
 
-  // Load lịch sử học tập
+  // Tải lịch sử học tập
   loadStudyHistory(user.uid);
-  
-  // Tự động vào phòng mặc định
+
+  // Tự động vào phòng mặc định + bật chat
   joinRoom('general');
+  initChat('general');
 }
 
 /* ---------- CẬP NHẬT UI KHI ĐĂNG XUẤT ---------- */

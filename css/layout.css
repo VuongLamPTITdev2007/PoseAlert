@@ -51,17 +51,64 @@
   grid-template-columns: 1fr 1fr 1fr;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
   position: relative; z-index: 1;
+  transition: grid-template-columns 0.4s ease;
 }
 
+/* Khi đã đăng nhập → thêm cột thứ 4 */
+.main-grid.has-community {
+  grid-template-columns: 1.1fr 1fr 1fr 1fr;
+}
+
+@media (max-width: 1280px) {
+  .main-grid.has-community { grid-template-columns: 1fr 1fr; }
+}
 @media (max-width: 1024px) {
   .main-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 640px) {
-  .main-grid { grid-template-columns: 1fr; }
+  .main-grid,
+  .main-grid.has-community { grid-template-columns: 1fr; }
 }
+
+/* Panel cộng đồng: chat chiếm nhiều chiều cao hơn */
+.community-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.community-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.75rem;
+}
+
+.community-tab {
+  flex: 1;
+  padding: 0.5rem 0.25rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.community-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.community-tab:hover { color: var(--text-primary); }
+
+.community-pane { display: none; flex-direction: column; flex: 1; gap: 0.6rem; }
+.community-pane.active { display: flex; }
+
 
 /* ---------- PANEL (Thẻ chứa nội dung) ---------- */
 .panel {
