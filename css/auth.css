@@ -8,11 +8,13 @@
 .btn-sign-in {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
-  padding: 0.4rem 0.9rem;
+  width: 100%;
+  padding: 0.55rem 1rem;
   border: 1px solid var(--accent);
   border-radius: 8px;
-  background: transparent;
+  background: rgba(0,212,255,0.05);
   color: var(--accent);
   font-family: 'Space Mono', monospace;
   font-size: 0.72rem;
@@ -25,43 +27,43 @@
   color: var(--bg-main);
   box-shadow: var(--glow-cyan);
 }
-.btn-sign-in .google-icon {
-  font-size: 1rem;
-}
+.google-icon { font-style: normal; font-weight: 900; font-size: 0.9rem; }
 
-/* User Info khi đã đăng nhập */
+/* User Info đã đăng nhập */
 .user-info {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
+  width: 100%;
 }
 .user-avatar {
-  width: 28px;
-  height: 28px;
+  width: 34px; height: 34px;
   border-radius: 50%;
   border: 2px solid var(--accent);
   object-fit: cover;
+  flex-shrink: 0;
 }
 .user-name {
-  font-family: 'Space Mono', monospace;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
+  font-weight: 600;
   color: var(--text-primary);
-  max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 1;
 }
 
 .btn-sign-out {
-  padding: 0.3rem 0.6rem;
+  padding: 0.2rem 0.5rem;
   border: 1px solid var(--accent-red);
-  border-radius: 6px;
+  border-radius: 4px;
   background: transparent;
   color: var(--accent-red);
   font-family: 'Space Mono', monospace;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 .btn-sign-out:hover {
   background: var(--accent-red);

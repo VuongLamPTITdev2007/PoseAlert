@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PoseAlert — Cảnh báo Tư thế Ngồi Học</title>
+  <title>PoseAlert — Hệ thống Nhận diện Tư thế AI</title>
+  <meta name="description" content="Ứng dụng nhận diện tư thế ngồi học realtime bằng AI, tích hợp phòng học ảo và lưu trữ đám mây."/>
 
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
 
-  <!-- ===== CÁC MODULE CSS ===== -->
+  <!-- CSS Modules -->
   <link rel="stylesheet" href="css/variables.css"/>
   <link rel="stylesheet" href="css/layout.css"/>
   <link rel="stylesheet" href="css/camera.css"/>
@@ -19,7 +20,6 @@
   <link rel="stylesheet" href="css/alert-popup.css"/>
   <link rel="stylesheet" href="css/scrollbar.css"/>
   <link rel="stylesheet" href="css/ai-loading.css"/>
-  <!-- CSS mới: Mạng lưới & Lưu trữ -->
   <link rel="stylesheet" href="css/auth.css"/>
   <link rel="stylesheet" href="css/network.css"/>
   <link rel="stylesheet" href="css/chat.css"/>
@@ -37,244 +37,255 @@
     </div>
   </div>
 
-  <!-- ========== HEADER ========== -->
-  <header class="header">
-    <div class="logo">
-      <span class="logo-icon">🧘</span>
-      <span class="logo-text">Pose<span class="accent">Alert</span></span>
-    </div>
-    <div class="header-meta">
-      <span id="session-time">Phiên: 00:00:00</span>
-      <div class="status-dot" id="status-dot"></div>
-      <span id="status-label">Chờ khởi động</span>
+  <!-- ========== APP SHELL ========== -->
+  <div class="app-shell">
 
-      <!-- Auth Section -->
-      <div class="auth-section" id="auth-section">
+    <!-- ===== SIDEBAR TRÁI ===== -->
+    <aside class="sidebar">
+
+      <!-- Logo -->
+      <div class="sidebar-logo">
+        <span class="logo-icon">🧘</span>
+        <span class="logo-text">Pose<span class="accent">Alert</span></span>
+      </div>
+
+      <!-- Camera -->
+      <div class="sidebar-section">
+        <div class="section-label">📷 Camera AI</div>
+        <div class="camera-container">
+          <canvas id="canvas"></canvas>
+          <video id="webcam-video" autoplay playsinline style="display:none;"></video>
+
+          <!-- AI Loading -->
+          <div class="ai-loading hidden" id="ai-loading">
+            <div class="ai-loading-ring">
+              <svg viewBox="0 0 60 60" fill="none">
+                <circle cx="30" cy="30" r="26" stroke="#1e2d47" stroke-width="4"/>
+                <circle cx="30" cy="30" r="26" stroke="#00d4ff" stroke-width="4"
+                  stroke-linecap="round" stroke-dasharray="50 113" class="ai-loading-arc"/>
+              </svg>
+              <span class="ai-loading-brain">🧠</span>
+            </div>
+            <div class="ai-loading-label" id="ai-loading-label">Đang tải AI...</div>
+            <div class="ai-loading-sub" id="ai-loading-sub">Lần đầu cần internet</div>
+            <div class="ai-loading-bar-wrap">
+              <div class="ai-loading-bar" id="ai-loading-bar"></div>
+            </div>
+            <div class="ai-loading-steps" id="ai-loading-steps">
+              <span class="ai-step" id="step-tfjs">⬜ TF.js</span>
+              <span class="ai-step" id="step-model">⬜ Model</span>
+              <span class="ai-step" id="step-cam">⬜ Cam</span>
+            </div>
+          </div>
+
+          <div class="camera-overlay" id="camera-overlay">
+            <div class="overlay-content">
+              <div class="big-icon">📷</div>
+              <p>Nhấn "Bắt đầu"</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+          <button class="btn btn-start" id="btn-start" onclick="startApp()">▶ Bắt đầu</button>
+          <button class="btn btn-stop hidden" id="btn-stop" onclick="stopApp()">⏹ Dừng</button>
+          <button class="btn btn-privacy" id="btn-privacy" onclick="togglePrivacy()">👻</button>
+        </div>
+      </div>
+
+      <!-- Tư thế hiện tại -->
+      <div class="sidebar-section">
+        <div class="section-label">🎯 Tư thế hiện tại</div>
+        <div class="current-pose-display">
+          <div class="pose-icon-big" id="pose-icon">🪑</div>
+          <div class="pose-name" id="pose-name">Chưa nhận diện</div>
+          <div class="pose-confidence" id="pose-confidence">—</div>
+        </div>
+
+        <!-- Thanh % tư thế -->
+        <div class="pose-results" id="pose-results"></div>
+      </div>
+
+      <!-- Pomodoro -->
+      <div class="sidebar-section">
+        <div class="section-label">🍅 Pomodoro</div>
+        <div class="pomodoro-section">
+          <div class="pomodoro-display">
+            <div class="pomodoro-time" id="pomodoro-time">25:00</div>
+            <div class="pomodoro-phase" id="pomodoro-phase">Tập trung học</div>
+          </div>
+          <div class="pomodoro-controls">
+            <button class="btn-pomo" id="btn-pomo-start" onclick="togglePomodoro()">▶</button>
+            <button class="btn-pomo btn-pomo-reset" onclick="resetPomodoro()">↺</button>
+          </div>
+          <div class="pomodoro-cycles">Chu kỳ: <strong id="pomo-cycles">0</strong></div>
+        </div>
+      </div>
+
+      <!-- Auth -->
+      <div class="sidebar-auth" id="auth-section">
         <button class="btn-sign-in" id="btn-sign-in" onclick="signInWithGoogle()">
-          <span class="google-icon">G</span> Đăng nhập
+          <span class="google-icon">G</span> Đăng nhập Google
         </button>
         <div class="user-info hidden" id="user-info">
           <img class="user-avatar" id="user-avatar" src="" alt=""/>
-          <span class="user-name" id="user-name"></span>
-          <button class="btn-sign-out" onclick="signOut()">Thoát</button>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- ========== LAYOUT CHÍNH ========== -->
-  <main class="main-grid">
-
-    <!-- CỘT TRÁI: Camera + Kết quả nhận diện -->
-    <section class="panel camera-panel">
-      <div class="panel-title">📷 Camera & Nhận diện</div>
-
-      <div class="camera-container">
-        <canvas id="canvas"></canvas>
-        <video id="webcam-video" autoplay playsinline style="display:none;"></video>
-
-        <!-- AI LOADING INDICATOR -->
-        <div class="ai-loading hidden" id="ai-loading">
-          <div class="ai-loading-ring">
-            <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="30" cy="30" r="26" stroke="#1e2d47" stroke-width="4"/>
-              <circle cx="30" cy="30" r="26" stroke="#00d4ff" stroke-width="4"
-                stroke-linecap="round"
-                stroke-dasharray="50 113"
-                class="ai-loading-arc"/>
-            </svg>
-            <span class="ai-loading-brain">🧠</span>
-          </div>
-          <div class="ai-loading-label" id="ai-loading-label">Đang tải model AI...</div>
-          <div class="ai-loading-sub" id="ai-loading-sub">Lần đầu cần kết nối internet</div>
-          <div class="ai-loading-bar-wrap">
-            <div class="ai-loading-bar" id="ai-loading-bar"></div>
-          </div>
-          <div class="ai-loading-steps" id="ai-loading-steps">
-            <span class="ai-step" id="step-tfjs">⬜ TensorFlow.js</span>
-            <span class="ai-step" id="step-model">⬜ MoveNet model</span>
-            <span class="ai-step" id="step-cam">⬜ Camera</span>
-          </div>
-        </div>
-
-        <div class="camera-overlay" id="camera-overlay">
-          <div class="overlay-content">
-            <div class="big-icon">📷</div>
-            <p>Nhấn "Bắt đầu" để khởi động camera</p>
+          <div class="user-details">
+            <span class="user-name" id="user-name"></span>
+            <button class="btn-sign-out" onclick="signOut()">Đăng xuất</button>
           </div>
         </div>
       </div>
 
-      <div class="controls">
-        <button class="btn btn-start" id="btn-start" onclick="startApp()">▶ Bắt đầu</button>
-        <button class="btn btn-stop hidden" id="btn-stop" onclick="stopApp()">⏹ Dừng</button>
-        <button class="btn" id="btn-privacy" onclick="togglePrivacy()" style="background: #374151; color: white;">👻 Bảo mật</button>
-      </div>
+    </aside>
 
-      <div class="pose-results" id="pose-results"></div>
-    </section>
+    <!-- ===== NỘI DUNG CHÍNH ===== -->
+    <main class="main-content">
 
-    <!-- CỘT GIỮA: Trạng thái hiện tại + Timer -->
-    <section class="panel status-panel">
-      <div class="panel-title">📊 Trạng thái Hiện tại</div>
-
-      <div class="current-pose-display">
-        <div class="pose-icon-big" id="pose-icon">🪑</div>
-        <div class="pose-name" id="pose-name">Chưa nhận diện</div>
-        <div class="pose-confidence" id="pose-confidence">0%</div>
-      </div>
-
-      <div class="alert-timer-section" id="alert-timer-section">
-        <div class="timer-label">⏱ Giữ tư thế sai</div>
-        <div class="timer-bar-wrap">
-          <div class="timer-bar" id="timer-bar"></div>
-        </div>
-        <div class="timer-countdown" id="timer-countdown">0 / 30 giây</div>
-      </div>
-
-      <div class="quick-stats">
-        <div class="stat-card good">
-          <div class="stat-num" id="stat-good">0%</div>
-          <div class="stat-label">✅ Ngồi đúng</div>
-        </div>
-        <div class="stat-card bad">
-          <div class="stat-num" id="stat-bad">0%</div>
-          <div class="stat-label">⚠️ Tư thế sai</div>
-        </div>
-        <div class="stat-card alerts">
-          <div class="stat-num" id="stat-alerts">0</div>
-          <div class="stat-label">🔔 Cảnh báo</div>
-        </div>
-      </div>
-
-      <div class="panel-title" style="margin-top:1.5rem;">🍅 Pomodoro Timer</div>
-      <div class="pomodoro-section">
-        <div class="pomodoro-display">
-          <div class="pomodoro-time" id="pomodoro-time">25:00</div>
-          <div class="pomodoro-phase" id="pomodoro-phase">Tập trung học</div>
-        </div>
-        <div class="pomodoro-controls">
-          <button class="btn-pomo" id="btn-pomo-start" onclick="togglePomodoro()">▶ Bắt đầu</button>
-          <button class="btn-pomo btn-pomo-reset" onclick="resetPomodoro()">↺ Reset</button>
-        </div>
-        <div class="pomodoro-cycles">
-          Chu kỳ hoàn thành: <strong id="pomo-cycles">0</strong>
-        </div>
-      </div>
-    </section>
-
-    <!-- CỘT PHẢI: Biểu đồ thống kê -->
-    <section class="panel chart-panel">
-      <div class="panel-title">📈 Dashboard Thống kê Phiên</div>
-
-      <div class="chart-wrap">
-        <canvas id="doughnut-chart"></canvas>
-      </div>
-      <div class="chart-legend" id="chart-legend"></div>
-
-      <div class="panel-title" style="margin-top:1.5rem; font-size:0.85rem;">📉 Lịch sử Tư thế (mỗi 5 giây)</div>
-      <div class="chart-wrap-line">
-        <canvas id="line-chart"></canvas>
-      </div>
-
-      <div class="panel-title" style="margin-top:1.5rem; font-size:0.85rem;">🗒 Nhật ký Cảnh báo</div>
-      <div class="alert-log" id="alert-log">
-        <p class="log-empty">Chưa có cảnh báo nào...</p>
-      </div>
-    </section>
-
-    <!-- CỘT THỨ 4: Phòng Học Ảo + Lịch sử Cloud (hiện khi đăng nhập) -->
-    <section class="panel community-panel hidden" id="network-panel">
-
-      <!-- TAB HEADER -->
-      <div class="community-tabs">
-        <div class="community-tab active" onclick="switchCommunityTab('room')">🌐 Phòng học</div>
-        <div class="community-tab" onclick="switchCommunityTab('history')">📚 Lịch sử</div>
-      </div>
-
-      <!-- TAB 1: PHÒNG HỌC ẢO -->
-      <div class="community-pane active" id="pane-room">
-        <div class="room-header">
-          <span class="room-name" id="room-name">📖 Phòng: general</span>
-          <span class="online-badge"><span id="online-count">0</span> online</span>
-        </div>
-
-        <div class="member-list" id="member-list">
-          <p class="log-empty">Chưa có ai trong phòng...</p>
-        </div>
-
-        <div class="panel-title" style="font-size:0.75rem; margin-top:0.5rem;">💬 Chat</div>
-        <div class="chat-container" style="flex:1;">
-          <div class="chat-messages" id="chat-messages">
-            <p class="log-empty">Chưa có tin nhắn...</p>
+      <!-- === HEADER TOPBAR === -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="status-indicator">
+            <div class="status-dot" id="status-dot"></div>
+            <span id="status-label">Chờ khởi động</span>
           </div>
-          <div class="chat-input-wrap">
-            <input type="text" class="chat-input" id="chat-input" placeholder="Nhắn tin..." maxlength="200"/>
-            <button class="btn-send" onclick="sendChatMessage()">&#x27A4;</button>
+          <span class="session-clock" id="session-time">Phiên: 00:00:00</span>
+        </div>
+        <div class="topbar-right">
+          <div class="alert-timer-compact" id="alert-timer-section">
+            <span class="timer-label-compact">⏱ Tư thế sai:</span>
+            <div class="timer-bar-wrap" style="width:120px;">
+              <div class="timer-bar" id="timer-bar"></div>
+            </div>
+            <span class="timer-countdown" id="timer-countdown">0/30s</span>
           </div>
         </div>
-      </div>
+      </header>
 
-      <!-- TAB 2: LỊCH SỬ HỌC TẬP -->
-      <div class="community-pane" id="pane-history">
-        <div class="weekly-summary">
-          <div class="weekly-card">
-            <div class="weekly-num" id="weekly-total-minutes">0</div>
-            <div class="weekly-label">⏱ Phút tuần này</div>
-          </div>
-          <div class="weekly-card">
-            <div class="weekly-num" id="weekly-avg-posture">0%</div>
-            <div class="weekly-label">🎯 TB Tư thế đúng</div>
-          </div>
-          <div class="weekly-card">
-            <div class="weekly-num" id="weekly-sessions">0</div>
-            <div class="weekly-label">📅 Số phiên</div>
+      <!-- === DASHBOARD GRID === -->
+      <div class="dashboard-grid">
+
+        <!-- Card: Thống kê nhanh -->
+        <div class="dash-card">
+          <div class="dash-card-title">📊 Thống kê phiên</div>
+          <div class="quick-stats">
+            <div class="stat-card good">
+              <div class="stat-num" id="stat-good">0%</div>
+              <div class="stat-label">✅ Ngồi đúng</div>
+            </div>
+            <div class="stat-card bad">
+              <div class="stat-num" id="stat-bad">0%</div>
+              <div class="stat-label">⚠️ Tư thế sai</div>
+            </div>
+            <div class="stat-card alerts">
+              <div class="stat-num" id="stat-alerts">0</div>
+              <div class="stat-label">🔔 Cảnh báo</div>
+            </div>
           </div>
         </div>
 
-        <div class="panel-title" style="font-size:0.75rem;">🕐 Các phiên gần đây</div>
-        <div class="study-history-list" id="study-history-list">
-          <p class="log-empty">Chưa có phiên học tập nào...</p>
+        <!-- Card: Biểu đồ tròn -->
+        <div class="dash-card">
+          <div class="dash-card-title">🥧 Tỷ lệ tư thế</div>
+          <div class="chart-wrap">
+            <canvas id="doughnut-chart"></canvas>
+          </div>
+          <div class="chart-legend" id="chart-legend"></div>
         </div>
-      </div>
 
-    </section>
+        <!-- Card: Biểu đồ đường -->
+        <div class="dash-card dash-card-wide">
+          <div class="dash-card-title">📉 Lịch sử tư thế (mỗi 5 giây)</div>
+          <div class="chart-wrap-line">
+            <canvas id="line-chart"></canvas>
+          </div>
+        </div>
 
-  </main>
+        <!-- Card: Nhật ký cảnh báo -->
+        <div class="dash-card">
+          <div class="dash-card-title">🗒 Nhật ký cảnh báo</div>
+          <div class="alert-log" id="alert-log">
+            <p class="log-empty">Chưa có cảnh báo nào...</p>
+          </div>
+        </div>
 
-        <p class="log-empty">Chưa có phiên học tập nào...</p>
-      </div>
-    </div>
+        <!-- Card: Phòng học ảo (chỉ hiện khi đăng nhập) -->
+        <div class="dash-card community-card hidden" id="network-panel">
+          <div class="community-tabs">
+            <div class="community-tab active" onclick="switchCommunityTab('room')">🌐 Phòng học</div>
+            <div class="community-tab" onclick="switchCommunityTab('history')">📚 Lịch sử</div>
+          </div>
 
-  </section>
+          <!-- Tab Phòng học -->
+          <div class="community-pane active" id="pane-room">
+            <div class="room-header">
+              <span class="room-name" id="room-name">📖 general</span>
+              <span class="online-badge"><span id="online-count">0</span> online</span>
+            </div>
+            <div class="member-list" id="member-list">
+              <p class="log-empty">Phòng trống...</p>
+            </div>
+            <div class="dash-card-title" style="margin-top:0.5rem; font-size:0.7rem;">💬 Chat</div>
+            <div class="chat-container" style="flex:1;">
+              <div class="chat-messages" id="chat-messages">
+                <p class="log-empty">Chưa có tin nhắn...</p>
+              </div>
+              <div class="chat-input-wrap">
+                <input type="text" class="chat-input" id="chat-input" placeholder="Nhắn tin..." maxlength="200"/>
+                <button class="btn-send" onclick="sendChatMessage()">&#x27A4;</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab Lịch sử -->
+          <div class="community-pane" id="pane-history">
+            <div class="weekly-summary">
+              <div class="weekly-card">
+                <div class="weekly-num" id="weekly-total-minutes">0</div>
+                <div class="weekly-label">⏱ Phút/tuần</div>
+              </div>
+              <div class="weekly-card">
+                <div class="weekly-num" id="weekly-avg-posture">0%</div>
+                <div class="weekly-label">🎯 TB đúng</div>
+              </div>
+              <div class="weekly-card">
+                <div class="weekly-num" id="weekly-sessions">0</div>
+                <div class="weekly-label">📅 Phiên</div>
+              </div>
+            </div>
+            <div class="study-history-list" id="study-history-list">
+              <p class="log-empty">Chưa có phiên nào...</p>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end dashboard-grid -->
+    </main>
+  </div><!-- end app-shell -->
 
   <!-- ========== THƯ VIỆN ========== -->
-  <!-- Firebase SDK (compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-
-  <!-- TensorFlow.js + MoveNet Pose Detection -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-  <!-- ===== CÁC MODULE JS (theo thứ tự phụ thuộc) ===== -->
-  <script src="js/firebase-config.js"></script>  <!-- 0. Firebase cấu hình -->
-  <script src="js/config.js"></script>            <!-- 1. Hằng số cấu hình -->
-  <script src="js/state.js"></script>             <!-- 2. Biến trạng thái toàn cục -->
-  <script src="js/pose-classifier.js"></script>   <!-- 3. Thuật toán phân loại tư thế -->
-  <script src="js/renderer.js"></script>          <!-- 4. Vẽ camera + skeleton -->
-  <script src="js/ui.js"></script>                <!-- 5. Cập nhật giao diện -->
-  <script src="js/alert-timer.js"></script>       <!-- 6. Timer cảnh báo 30s + popup -->
-  <script src="js/stats.js"></script>             <!-- 7. Thống kê phiên -->
-  <script src="js/charts.js"></script>            <!-- 8. Biểu đồ Chart.js -->
-  <script src="js/pomodoro.js"></script>          <!-- 9. Pomodoro timer -->
-  <script src="js/auth.js"></script>              <!-- 10. Xác thực Google -->
-  <script src="js/database.js"></script>          <!-- 11. Lưu trữ phiên học -->
-  <script src="js/network.js"></script>           <!-- 12. Phòng học ảo -->
-  <script src="js/chat.js"></script>              <!-- 13. Chat nhắn tin -->
-  <script src="js/app.js"></script>               <!-- 14. Điều phối chính -->
+  <!-- JS Modules -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/pose-classifier.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/alert-timer.js"></script>
+  <script src="js/stats.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/pomodoro.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/network.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
