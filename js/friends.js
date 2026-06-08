@@ -504,6 +504,7 @@ let activeDmFriendUid = null;
 let dmChatRef = null;
 let dmPeerStatusRef = null;
 let dmLoadedMessages = {};
+let pendingDmFiles = [];
 
 async function openDMWithFriend(friendUid, friendName, friendAvatar) {
   if (!currentUser || !isFirebaseConfigured) return;
@@ -543,6 +544,8 @@ function openDmChat(dmId, friendUid, friendName, friendAvatar) {
   activeDmGroupId = dmId;
   activeDmFriendUid = friendUid;
   dmLoadedMessages = {};
+  pendingDmFiles = [];
+  renderPendingDmFiles();
 
   // Highlight friend item
   document.querySelectorAll('.friend-item').forEach(el => {
@@ -663,7 +666,7 @@ function renderDmMessage(msgId, msg) {
   while (container.children.length > 120) container.removeChild(container.firstChild);
 }
 
-function sendDmMessage() {
+async function sendDmMessage() {
   if (!currentUser || !activeDmGroupId || !isFirebaseConfigured) return;
 
   // Check block
@@ -675,7 +678,17 @@ function sendDmMessage() {
   const input = document.getElementById('dm-chat-input');
   if (!input) return;
   const text = input.value.trim();
-  if (!text) return;
+  if (!text && pendingDmFiles.length === 0) return;
+
+  if (pendingDmFiles.length > 0) {
+    await sendPendingDmFiles();
+  }
+
+  if (!text) {
+    input.value = '';
+    input.focus();
+    return;
+  }
 
   db.ref(`groups/${activeDmGroupId}/chat`).push({
     uid: currentUser.uid,
@@ -709,28 +722,116 @@ function closeDmSearch() {
 function toggleDmPickerPanel() { showToast('Tính năng emoji cho DM sắp ra mắt!', 'info'); }
 function triggerDmFileSelect() { document.getElementById('dm-file-input')?.click(); }
 async function handleDmFileSelected(event) {
-  const file = event.target.files[0];
-  if (!file || !activeDmGroupId) return;
-  if (file.size > 102400 && !storage) { showToast('Tệp quá lớn!', 'error'); return; }
-  showToast('📁 Đang tải lên...', 'info');
+  const files = Array.from(event.target.files || []);
+  if (!files.length || !activeDmGroupId) return;
+
+  if (activeDmFriendUid && (myBlocks[activeDmFriendUid] || myBlockedBy[activeDmFriendUid])) {
+    showToast('⚠️ Không thể gửi tệp! Người dùng đã bị chặn.', 'error');
+    event.target.value = '';
+    return;
+  }
+
+  const newFiles = files.map(file => ({
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    file
+  }));
+
+  pendingDmFiles = pendingDmFiles.concat(newFiles);
+  renderPendingDmFiles();
+  event.target.value = '';
+}
+
+async function sendPendingDmFiles() {
+  if (!currentUser || !activeDmGroupId || pendingDmFiles.length === 0) return;
+
+  const filesToSend = [...pendingDmFiles];
+  for (const item of filesToSend) {
+    const success = await sendSinglePendingDmFile(item);
+    if (success) {
+      pendingDmFiles = pendingDmFiles.filter(p => p.id !== item.id);
+      renderPendingDmFiles();
+    }
+  }
+}
+
+async function sendSinglePendingDmFile(item) {
+  if (!currentUser || !activeDmGroupId || !item || !item.file) return false;
+
   try {
+    showToast(`📁 Đang tải tệp lên: ${item.file.name}`, 'info');
+
     let fileUrl = '';
     if (storage) {
-      const ref = storage.ref().child(`chats/${activeDmGroupId}/${Date.now()}_${file.name}`);
-      const snap = await ref.put(file);
+      const ref = storage.ref().child(`chats/${activeDmGroupId}/${Date.now()}_${item.file.name}`);
+      const snap = await ref.put(item.file);
       fileUrl = await snap.ref.getDownloadURL();
     } else {
-      fileUrl = await new Promise((res, rej) => { const r = new FileReader(); r.onload = e => res(e.target.result); r.onerror = rej; r.readAsDataURL(file); });
+      if (item.file.size > 102400) {
+        showToast('Tệp quá lớn!', 'error');
+        return false;
+      }
+      fileUrl = await new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.onload = e => res(e.target.result);
+        reader.onerror = rej;
+        reader.readAsDataURL(item.file);
+      });
     }
-    const type = file.type.startsWith('image/') ? 'image' : 'file';
-    db.ref(`groups/${activeDmGroupId}/chat`).push({
-      uid: currentUser.uid, name: currentUser.displayName || 'Ẩn danh', avatar: currentUser.photoURL || '',
-      text: '', type, fileUrl, fileName: file.name, fileSize: file.size,
+
+    const type = item.file.type.startsWith('image/') ? 'image' : 'file';
+
+    await db.ref(`groups/${activeDmGroupId}/chat`).push({
+      uid: currentUser.uid,
+      name: currentUser.displayName || 'Ẩn danh',
+      avatar: currentUser.photoURL || '',
+      text: '',
+      type,
+      fileUrl,
+      fileName: item.file.name,
+      fileSize: item.file.size,
       timestamp: firebase.database.ServerValue.TIMESTAMP
     });
-    showToast('Tải lên thành công!', 'success');
-  } catch(e) { showToast('Lỗi tải tệp!', 'error'); }
-  event.target.value = '';
+
+    showToast(`Tệp ${item.file.name} đã gửi thành công!`, 'success');
+    return true;
+  } catch (e) {
+    console.error(e);
+    showToast(`Lỗi tải tệp ${item.file.name}!`, 'error');
+    return false;
+  }
+}
+
+function renderPendingDmFiles() {
+  const preview = document.getElementById('dm-file-preview');
+  if (!preview) return;
+
+  if (pendingDmFiles.length === 0) {
+    preview.classList.add('hidden');
+    preview.innerHTML = '';
+    return;
+  }
+
+  preview.classList.remove('hidden');
+  preview.innerHTML = pendingDmFiles.map(item => {
+    const name = escapeHtml(item.file.name);
+    const size = formatBytes(item.file.size);
+    const icon = getFilePreviewIcon(item.file);
+    return `
+      <div class="chat-file-preview-card">
+        <span class="chat-file-preview-icon">${icon}</span>
+        <div class="chat-file-preview-info">
+          <div class="chat-file-preview-name" title="${name}">${name}</div>
+          <div class="chat-file-preview-size">${size}</div>
+        </div>
+        <button class="chat-file-preview-cancel" onclick="removePendingDmFile('${item.id}')" title="Hủy tệp">✕</button>
+      </div>
+    `;
+  }).join('');
+}
+
+function removePendingDmFile(id) {
+  pendingDmFiles = pendingDmFiles.filter(item => item.id !== id);
+  renderPendingDmFiles();
 }
 
 // Enter to send DM
