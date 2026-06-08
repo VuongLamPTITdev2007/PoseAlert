@@ -107,35 +107,40 @@ Mặc định để trống — nếu bạn muốn, tôi có thể thêm `MIT` l
 
 ## 📁 Cấu trúc Mã nguồn (Modular)
 
-Mã nguồn được viết hoàn toàn bằng Vanilla JavaScript và CSS thuần, được chia nhỏ thành các module cực kỳ dễ bảo trì:
+Mã nguồn được viết hoàn toàn bằng Vanilla JavaScript và CSS thuần, phân tầng rõ ràng giữa Giao diện, Tài nguyên tĩnh và Báo cáo học thuật:
 
 ```text
 PoseAlert/
-├── index.html            ← Giao diện Web SPA (Trang chính duy nhất)
-├── README.md             ← Tài liệu Markdown
-├── bao_cao.tex           ← Báo cáo học thuật (LaTeX)
-├── docs/                 ← Thư mục tài liệu phụ
-│   ├── setup-guide.html  (Hướng dẫn cấu hình Firebase)
-│   ├── css/setup-guide.css
-│   └── js/setup-guide.js
-├── css/                  ← (14 Module CSS Giao diện)
+├── assets/               ← Tài nguyên tĩnh của Website
+│   ├── images/
+│   └── sounds/
+├── css/                  ← (19 Module CSS)
 │   ├── variables.css, layout.css, camera.css...
 │   └── gamification.css, network.css, chat.css...
-└── js/                   ← (12 Module JS Logic)
-    ├── config.js         (Thông số & Thuật toán)
-    ├── pose-classifier.js(Lõi nhận diện AI)
-    ├── database.js, auth.js (Kết nối Đám mây Firebase)
-    ├── gamification.js   (Logic Nhiệm vụ & Chuỗi lửa)
-    └── app.js, charts.js, pomodoro.js, ui.js...
+├── docs/                 ← Thư mục tài liệu phụ (Hướng dẫn Setup)
+├── js/                   ← (23 Module JS Logic)
+│   ├── config.js         (Thông số & Thuật toán)
+│   ├── pose-classifier.js(Lõi nhận diện AI)
+│   ├── audio.js          (Web Audio API - Synthesizer)
+│   ├── gamification.js   (Nhiệm vụ & Chuỗi lửa)
+│   └── auth.js, chat.js, pomodoro.js, ui.js...
+├── report/               ← Không gian riêng cho Báo cáo
+│   ├── images/           (Chứa ảnh chụp giao diện cho báo cáo)
+│   └── bao_cao.tex       (File báo cáo LaTeX 30 trang)
+├── index.html            ← Giao diện Web SPA (Trang chính duy nhất)
+├── package.json          ← Tooling & Format configs
+├── .eslintrc.json        ← Cấu hình ESLint
+├── .prettierrc           ← Cấu hình Prettier
+└── README.md             ← Tài liệu Markdown
 ```
 
 ---
 
 ## 📚 Tài liệu Báo Cáo 
 
-Dự án bao gồm sẵn mã nguồn tài liệu dành cho việc báo cáo học thuật:
-- **`bao_cao.tex`**: File báo cáo LaTeX chi tiết (5 chương).
-*Có thể biên dịch các file này thông qua Texmaker hoặc dán vào Overleaf để xuất PDF.*
+Dự án đã được quy hoạch sẵn cấu trúc báo cáo 30 trang tại:
+- **`report/bao_cao.tex`**: File báo cáo LaTeX chuẩn cấu trúc PTIT (4 Chương).
+*Có thể biên dịch thông qua Texmaker hoặc dán vào Overleaf để xuất PDF.*
 
 ---
 
