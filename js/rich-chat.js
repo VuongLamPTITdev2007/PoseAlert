@@ -556,6 +556,12 @@ async function handleChatFileSelected(event) {
   const files = Array.from(event.target.files || []);
   if (!files.length) return;
 
+  if (!activeGroupId) {
+    showToast('⚠️ Chưa chọn nhóm để gửi tệp.', 'error');
+    event.target.value = '';
+    return;
+  }
+
   const group = myGroups[activeGroupId];
   if (group && group.type === 'dm') {
     const peerUid = Object.keys(group.members).find(uid => uid !== currentUser.uid);
@@ -573,6 +579,7 @@ async function handleChatFileSelected(event) {
 
   pendingChatFiles = pendingChatFiles.concat(newPending);
   renderPendingChatFiles();
+  showToast('📁 Đã thêm tệp. Nhấn nút gửi để gửi tệp.', 'info');
   event.target.value = '';
 }
 
@@ -657,7 +664,13 @@ function renderPendingChatFiles() {
   }
 
   preview.classList.remove('hidden');
-  preview.innerHTML = pendingChatFiles.map(item => {
+  const toolbar = `
+    <div class="chat-file-preview-toolbar">
+      <button class="btn-file-send" onclick="sendGroupMessage()">Gửi tệp</button>
+    </div>
+  `;
+
+  const itemsHtml = pendingChatFiles.map(item => {
     const itemName = escapeHtml(item.file.name);
     const itemSize = formatBytes(item.file.size);
     const itemIcon = getFilePreviewIcon(item.file);
@@ -672,6 +685,8 @@ function renderPendingChatFiles() {
       </div>
     `;
   }).join('');
+
+  preview.innerHTML = toolbar + itemsHtml;
 }
 
 function removePendingChatFile(id) {

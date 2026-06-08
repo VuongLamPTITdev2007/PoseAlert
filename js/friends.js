@@ -723,7 +723,13 @@ function toggleDmPickerPanel() { showToast('Tính năng emoji cho DM sắp ra m�
 function triggerDmFileSelect() { document.getElementById('dm-file-input')?.click(); }
 async function handleDmFileSelected(event) {
   const files = Array.from(event.target.files || []);
-  if (!files.length || !activeDmGroupId) return;
+  if (!files.length) return;
+
+  if (!activeDmGroupId) {
+    showToast('⚠️ Chưa chọn bạn để gửi tệp.', 'error');
+    event.target.value = '';
+    return;
+  }
 
   if (activeDmFriendUid && (myBlocks[activeDmFriendUid] || myBlockedBy[activeDmFriendUid])) {
     showToast('⚠️ Không thể gửi tệp! Người dùng đã bị chặn.', 'error');
@@ -738,6 +744,7 @@ async function handleDmFileSelected(event) {
 
   pendingDmFiles = pendingDmFiles.concat(newFiles);
   renderPendingDmFiles();
+  showToast('📁 Đã thêm tệp. Nhấn nút gửi để gửi tệp.', 'info');
   event.target.value = '';
 }
 
@@ -812,7 +819,13 @@ function renderPendingDmFiles() {
   }
 
   preview.classList.remove('hidden');
-  preview.innerHTML = pendingDmFiles.map(item => {
+  const toolbar = `
+    <div class="chat-file-preview-toolbar">
+      <button class="btn-file-send" onclick="sendDmMessage()">Gửi tệp</button>
+    </div>
+  `;
+
+  const itemsHtml = pendingDmFiles.map(item => {
     const name = escapeHtml(item.file.name);
     const size = formatBytes(item.file.size);
     const icon = getFilePreviewIcon(item.file);
@@ -827,6 +840,8 @@ function renderPendingDmFiles() {
       </div>
     `;
   }).join('');
+
+  preview.innerHTML = toolbar + itemsHtml;
 }
 
 function removePendingDmFile(id) {
