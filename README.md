@@ -1,6 +1,6 @@
 # 🧘 PoseAlert — Hệ thống Nhận diện và Cảnh báo Tư thế AI
 
-[![Live Demo (Giao diện Mới)](https://img.shields.io/badge/Live_Demo-Truy_cập_Giao_diện_mới-success?style=for-the-badge&logo=github)](https://VuongLam_2007-dev.github.io/PoseAlert/)
+[![Live Demo (Giao diện Mới)](https://img.shields.io/badge/Live_Demo-Truy_cập_Giao_diện_mới-success?style=for-the-badge&logo=github)](https://VuongLamPTITdev2007.github.io/PoseAlert/)
 [![TensorFlow.js](https://img.shields.io/badge/TensorFlow.js-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://www.tensorflow.org/js)
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)]()
 
@@ -28,7 +28,7 @@
 Bạn không cần phải cài đặt bất kỳ phần mềm hay thư viện nào!
 
 1. **Cách 1 (Nhanh nhất):** Truy cập trực tiếp link Live Demo (Giao diện mới):
-   👉 **[https://vietdung29092007-dev.github.io/PoseAlert/](https://vietdung29092007-dev.github.io/PoseAlert/)**
+   👉 **[https://VuongLamPTITdev2007.github.io/PoseAlert/](https://VuongLamPTITdev2007.github.io/PoseAlert/)**
 
 2. **Cách 2 (Chạy ở máy tính cục bộ):**
    - Tải toàn bộ mã nguồn về máy.
