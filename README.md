@@ -1,15 +1,16 @@
 # 🧘 PoseAlert — Hệ thống Nhận diện và Cảnh báo Tư thế AI
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Truy_cập_ngay-success?style=for-the-badge&logo=github)](https://vietdung29092007-dev.github.io/d-n-b-i-t-p-cu-i-k-/)
+[![Live Demo (Giao diện Mới)](https://img.shields.io/badge/Live_Demo-Truy_cập_Giao_diện_mới-success?style=for-the-badge&logo=github)](https://vietdung29092007-dev.github.io/d-n-b-i-t-p-cu-i-k-/)
 [![TensorFlow.js](https://img.shields.io/badge/TensorFlow.js-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://www.tensorflow.org/js)
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)]()
 
-> Ứng dụng web nhận diện tư thế ngồi học theo thời gian thực (Real-time). Tích hợp đồng hồ Pomodoro và Dashboard thống kê sức khỏe. Hoạt động 100% trên trình duyệt (Client-side) đảm bảo quyền riêng tư tối đa.
+> Ứng dụng web nhận diện tư thế ngồi học theo thời gian thực (Real-time) với **Giao diện 2-Panel hoàn toàn mới**. Tích hợp đồng hồ Pomodoro và Dashboard thống kê sức khỏe. Hoạt động 100% trên trình duyệt (Client-side) đảm bảo quyền riêng tư tối đa.
 
 ---
 
 ## 🌟 Tính năng nổi bật
 
+- 🎨 **Giao diện Mới (V2)**: Thiết kế 2-Panel thông minh, rộng rãi, hỗ trợ đổi Theme (Cyber, Aurora, Sunset) trực tiếp.
 - 🤖 **Nhận diện AI Thời gian thực**: Tích hợp mô hình `MoveNet (Lightning)` cực nhanh, quét 17 điểm khớp trên cơ thể.
 - 🎯 **Phân tích 4 Tư thế**: Nhận diện chuẩn xác *Ngồi đúng*, *Cúi đầu*, *Vẹo lưng*, và *Mắt quá gần*.
 - ⚠️ **Hệ thống Cảnh báo Thông minh**: Tự động phát âm thanh chuông và hiển thị popup nếu giữ tư thế sai liên tục trong 30 giây.
@@ -26,7 +27,7 @@
 
 Bạn không cần phải cài đặt bất kỳ phần mềm hay thư viện nào!
 
-1. **Cách 1 (Nhanh nhất):** Truy cập trực tiếp link Live Demo:
+1. **Cách 1 (Nhanh nhất):** Truy cập trực tiếp link Live Demo (Giao diện mới):
    👉 **[https://vietdung29092007-dev.github.io/d-n-b-i-t-p-cu-i-k-/](https://vietdung29092007-dev.github.io/d-n-b-i-t-p-cu-i-k-/)**
 
 2. **Cách 2 (Chạy ở máy tính cục bộ):**
