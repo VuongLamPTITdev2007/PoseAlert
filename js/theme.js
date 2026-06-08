@@ -3,7 +3,7 @@
    ================================================ */
 
 const THEME_STORAGE_KEY = 'posealert-theme';
-const VALID_THEMES = ['cyber', 'aurora', 'sunset'];
+const VALID_THEMES = ['cyber', 'aurora', 'sunset', 'eye'];
 
 /**
  * Đặt theme và lưu vào localStorage

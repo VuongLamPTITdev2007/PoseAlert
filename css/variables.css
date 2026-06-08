@@ -60,6 +60,32 @@ body[data-theme="sunset"] {
   --grid-color: rgba(249, 115, 22, 0.03);
 }
 
+/* =============================================
+   THEME: Eye Protect — Giảm ánh sáng xanh, ấm dịu
+   Mục tiêu: giảm tông xanh, hơi ngả vàng/amber để bảo vệ mắt
+   ============================================= */
+body[data-theme="eye"] {
+  --bg-main: #14100b;       /* nền tối ấm */
+  --bg-panel: #201912;
+  --bg-card: #282116;
+  --accent: #ffb86b;       /* amber nhẹ */
+  --accent-green: #8fd19a;
+  --accent-red: #ff6b6b;
+  --accent-yellow: #ffd47a;
+  --accent-orange: #ff9a3d;
+  --text-primary: #fff6e8; /* chữ ấm, không lạnh */
+  --text-secondary: #c7b39a;
+  --border: #392b1f;
+  --glow-cyan: 0 0 20px rgba(255, 184, 107, 0.15);
+  --glow-green: 0 0 20px rgba(143, 209, 154, 0.15);
+  --glow-red: 0 0 20px rgba(255, 107, 107, 0.18);
+  --grid-color: rgba(255, 184, 107, 0.02);
+}
+
+body[data-theme="eye"] .theme-btn.active {
+  box-shadow: 0 0 12px rgba(255, 184, 107, 0.32);
+}
+
 /* ---------- Reset & Base ---------- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
