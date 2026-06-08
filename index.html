@@ -27,8 +27,82 @@
   <link rel="stylesheet" href="css/gamification.css"/>
   <link rel="stylesheet" href="css/friends.css"/>
   <link rel="stylesheet" href="css/groups.css"/>
+  <link rel="stylesheet" href="css/calling.css"/>
 </head>
 <body>
+
+  <!-- ========== INCOMING CALL POPUP ========== -->
+  <div id="incoming-call-popup" class="hidden">
+    <div class="incoming-call-ring"></div>
+    <div class="incoming-call-ring"></div>
+    <div class="incoming-call-top">
+      <div class="incoming-call-avatar" id="incoming-call-avatar">?</div>
+      <div class="incoming-call-info">
+        <div class="incoming-call-label">📹 Cuộc gọi đến</div>
+        <div class="incoming-call-name" id="incoming-call-name">...</div>
+        <div class="incoming-call-sub" id="incoming-call-sub">Gọi video</div>
+      </div>
+    </div>
+    <div class="incoming-call-actions">
+      <button class="btn-call-answer" onclick="answerCall(document.getElementById('incoming-call-popup').dataset.callId)">
+        📞 Nghe
+      </button>
+      <button class="btn-call-decline" onclick="declineCall(document.getElementById('incoming-call-popup').dataset.callId)">
+        📵 Từ chối
+      </button>
+    </div>
+  </div>
+
+  <!-- ========== CALL OVERLAY ========== -->
+  <div id="call-overlay" class="hidden">
+    <!-- Header -->
+    <div class="call-header">
+      <div class="call-header-left">
+        <div class="call-header-icon">📹</div>
+        <div>
+          <div class="call-header-name" id="call-header-name">Cuộc gọi</div>
+          <div class="call-header-sub" id="call-header-sub">Đang kết nối...</div>
+        </div>
+      </div>
+      <div class="call-timer" id="call-timer">00:00</div>
+    </div>
+
+    <!-- Video area -->
+    <div class="call-video-area">
+      <!-- Remote videos -->
+      <div id="call-remote-grid">
+        <!-- Waiting state (hiện khi chưa có remote stream) -->
+        <div class="call-waiting" id="call-waiting-state">
+          <div class="call-waiting-ring">
+            <div class="call-waiting-icon">📞</div>
+          </div>
+          <div class="call-waiting-text">Đang chờ kết nối...</div>
+        </div>
+      </div>
+
+      <!-- Local video (PiP) -->
+      <div class="call-local-wrap">
+        <video id="call-local-video" autoplay playsinline muted></video>
+        <div class="call-local-label">Bạn</div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="call-controls">
+      <button class="call-ctrl-btn" id="call-btn-mic" onclick="toggleMic()">
+        <span class="ctrl-icon">🔇</span>
+        Tắt mic
+      </button>
+      <button class="call-ctrl-btn" id="call-btn-cam" onclick="toggleCam()">
+        <span class="ctrl-icon">📵</span>
+        Tắt cam
+      </button>
+      <button class="btn-end-call" onclick="endCall()">
+        <span class="ctrl-icon">📵</span>
+        Kết thúc
+      </button>
+    </div>
+  </div>
 
   <!-- ========== POPUP CẢNH BÁO ========== -->
   <div id="alert-overlay" class="alert-overlay hidden">
@@ -323,8 +397,13 @@
               <div class="group-chat-section hidden" id="group-chat-section">
                 <div class="group-chat-header">
                   <span class="group-chat-name" id="group-chat-header-name">👥 Nhóm</span>
-                  <button class="btn-leave-group"
-                    onclick="activeGroupId && leaveGroup(activeGroupId)">Rời nhóm</button>
+                  <div style="display:flex;gap:0.4rem;align-items:center;">
+                    <button class="btn-call-group" onclick="activeGroupId && callGroup(activeGroupId)">
+                      📞 Gọi nhóm
+                    </button>
+                    <button class="btn-leave-group"
+                      onclick="activeGroupId && leaveGroup(activeGroupId)">Rời nhóm</button>
+                  </div>
                 </div>
                 <div class="group-chat-messages" id="group-chat-messages"></div>
                 <div class="group-chat-input-wrap">
@@ -403,6 +482,7 @@
   <script src="js/chat.js"></script>
   <script src="js/friends.js"></script>
   <script src="js/groups.js"></script>
+  <script src="js/calling.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

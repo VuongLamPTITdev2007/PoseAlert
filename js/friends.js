@@ -273,7 +273,10 @@ function renderFriendList() {
         <span class="friend-name">${escapeHtml(f.name || 'Bạn bè')}</span>
         <span class="friend-status-text" id="fstatus-${uid}">—</span>
       </div>
-      <button class="btn-chat-friend" onclick="openDMWithFriend('${uid}', '${escapeHtml(f.name || 'Bạn bè')}', '${f.avatar || ''}')">
+      <button class="btn-call-friend" title="Gọi video" onclick="callFriend('${uid}', '${escapeHtml(f.name || 'Bạn bè')}', '${f.avatar || ''}')">
+        📞
+      </button>
+      <button class="btn-chat-friend" title="Nhắn tin" onclick="openDMWithFriend('${uid}', '${escapeHtml(f.name || 'Bạn bè')}', '${f.avatar || ''}')">
         💬
       </button>
     </div>

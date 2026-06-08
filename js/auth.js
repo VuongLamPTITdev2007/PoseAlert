@@ -25,6 +25,10 @@ async function signInWithGoogle() {
 /* ---------- ĐĂNG XUẤT ---------- */
 async function signOut() {
   try {
+    // Kết thúc cuộc gọi nếu đang gọi
+    if (typeof activeCallId !== 'undefined' && activeCallId) {
+      if (typeof endCall === 'function') endCall();
+    }
     // Xóa presence trước khi đăng xuất
     if (currentUser && currentRoomId) {
       await leaveRoom();
@@ -92,6 +96,9 @@ function onAuthSuccess(user) {
   // Khởi tạo Kết bạn & Nhóm
   if (typeof initFriends === 'function') initFriends();
   if (typeof initGroups  === 'function') initGroups();
+
+  // Khởi tạo Gọi video/audio
+  if (typeof initCalling === 'function') initCalling();
 
   // Khởi tạo Gamification (Streak & Quests)
   if (typeof initGamification === 'function') {
