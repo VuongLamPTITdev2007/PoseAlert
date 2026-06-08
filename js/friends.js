@@ -21,12 +21,24 @@ function initFriends() {
    ============================================= */
 function saveUserProfile(user) {
   if (!isFirebaseConfigured || !user) return;
-  db.ref('users/' + user.uid).set({
+
+  const profileData = {
     uid: user.uid,
-    displayName: user.displayName || 'Ẩn danh',
+    displayName: user.displayName || user.email || 'Ẩn danh',
+    email: user.email || '',
     avatar: user.photoURL || '',
+    online: true,
     updatedAt: firebase.database.ServerValue.TIMESTAMP
-  });
+  };
+
+  console.log('[Friends] Saving user profile:', profileData);
+
+  db.ref('users/' + user.uid).update(profileData)
+    .then(() => console.log('[Friends] ✅ Profile saved to /users/' + user.uid))
+    .catch(err => console.error('[Friends] ❌ Failed to save profile:', err));
+
+  // Đặt offline khi disconnect
+  db.ref('users/' + user.uid + '/online').onDisconnect().set(false);
 }
 
 /* =============================================
@@ -34,18 +46,41 @@ function saveUserProfile(user) {
    ============================================= */
 async function searchUsers(query) {
   if (!query || query.trim().length < 2) return [];
+  if (!currentUser || !isFirebaseConfigured) return [];
   const q = query.trim().toLowerCase();
 
-  const snapshot = await db.ref('users').once('value');
-  const results = [];
-  snapshot.forEach(child => {
-    const u = child.val();
-    if (u.uid === currentUser.uid) return; // bỏ bản thân
-    if ((u.displayName || '').toLowerCase().includes(q)) {
-      results.push(u);
+  console.log('[Friends] Searching users with query:', q);
+
+  try {
+    const snapshot = await db.ref('users').once('value');
+    const allUsers = snapshot.val();
+    console.log('[Friends] Total users in DB:', allUsers ? Object.keys(allUsers).length : 0, allUsers);
+
+    if (!allUsers) {
+      console.warn('[Friends] /users node is empty or no permission to read.');
+      return [];
     }
-  });
-  return results.slice(0, 10);
+
+    const results = [];
+    snapshot.forEach(child => {
+      const u = child.val();
+      if (!u) return;
+      if (u.uid === currentUser.uid) return; // bỏ bản thân
+
+      const nameMatch  = (u.displayName || '').toLowerCase().includes(q);
+      const emailMatch = (u.email || '').toLowerCase().includes(q);
+
+      if (nameMatch || emailMatch) {
+        results.push(u);
+      }
+    });
+
+    console.log('[Friends] Search results:', results.length, results);
+    return results.slice(0, 10);
+  } catch (err) {
+    console.error('[Friends] ❌ searchUsers error:', err);
+    return [];
+  }
 }
 
 /* =============================================
@@ -270,6 +305,11 @@ function openFindFriendModal() {
   if (input) { input.value = ''; input.focus(); }
   const results = document.getElementById('search-results');
   if (results) results.innerHTML = '<p class="log-empty">Nhập tên để tìm kiếm...</p>';
+
+  // Force sync profile mỗi lần mở modal (đảm bảo người khác tìm thấy bạn)
+  if (currentUser && typeof saveUserProfile === 'function') {
+    saveUserProfile(currentUser);
+  }
 }
 
 function closeFindFriendModal() {
