@@ -332,3 +332,97 @@
   filter: brightness(1.1);
   box-shadow: var(--glow-green);
 }
+
+/* ----- Nút Chi tiết nhóm ----- */
+.btn-group-details {
+  padding: 0.3rem 0.65rem;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(0, 212, 255, 0.08);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.btn-group-details:hover {
+  background: rgba(0, 212, 255, 0.2);
+  box-shadow: var(--glow-cyan);
+  transform: translateY(-1px);
+}
+
+/* ----- Vai trò trong nhóm ----- */
+.role-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.role-badge-highest {
+  background: rgba(255, 159, 67, 0.15);
+  color: #ff9f43;
+  border: 1px solid rgba(255, 159, 67, 0.3);
+}
+.role-badge-admin {
+  background: rgba(0, 212, 255, 0.12);
+  color: var(--accent);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+}
+.role-badge-member {
+  background: rgba(158, 158, 158, 0.12);
+  color: var(--text-secondary);
+  border: 1px solid rgba(158, 158, 158, 0.2);
+}
+
+/* ----- Nút bấm quản lý thành viên ----- */
+.btn-member-action {
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  border: 1px solid transparent;
+}
+
+.btn-promote {
+  background: rgba(0, 255, 136, 0.1);
+  color: var(--accent-green);
+  border-color: rgba(0, 255, 136, 0.3);
+}
+.btn-promote:hover {
+  background: rgba(0, 255, 136, 0.2);
+  box-shadow: var(--glow-green);
+}
+
+.btn-demote {
+  background: rgba(255, 71, 87, 0.08);
+  color: var(--accent-red);
+  border-color: rgba(255, 71, 87, 0.3);
+}
+.btn-demote:hover {
+  background: rgba(255, 71, 87, 0.18);
+}
+
+.btn-transfer {
+  background: rgba(0, 212, 255, 0.1);
+  color: var(--accent);
+  border-color: rgba(0, 212, 255, 0.3);
+}
+.btn-transfer:hover {
+  background: rgba(0, 212, 255, 0.2);
+  box-shadow: var(--glow-cyan);
+}
+
+.member-item-actions {
+  display: flex;
+  gap: 0.3rem;
+}

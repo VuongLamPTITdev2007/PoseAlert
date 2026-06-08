@@ -401,6 +401,9 @@
                     <button class="btn-call-group" onclick="activeGroupId && callGroup(activeGroupId)">
                       📞 Gọi nhóm
                     </button>
+                    <button class="btn-group-details" onclick="activeGroupId && openGroupDetailsModal(activeGroupId)">
+                      ℹ️ Chi tiết
+                    </button>
                     <button class="btn-leave-group"
                       onclick="activeGroupId && leaveGroup(activeGroupId)">Rời nhóm</button>
                   </div>
@@ -455,6 +458,38 @@
       <button class="btn-create-group-submit" onclick="createGroup()">🚀 Tạo nhóm</button>
     </div>
   </div>
+
+  <!-- ========== MODAL: Chi tiết nhóm ========== -->
+  <div class="modal-overlay hidden" id="modal-group-details">
+    <div class="modal-box" style="width: 420px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden;">
+      <div class="modal-header" style="flex-shrink: 0;">
+        <span class="modal-title" id="group-details-title">ℹ️ Chi tiết nhóm</span>
+        <button class="modal-close" onclick="closeGroupDetailsModal()">✕</button>
+      </div>
+      <div style="flex: 1; overflow-y: auto; padding-right: 4px; display: flex; flex-direction: column; gap: 1rem;">
+        <!-- Section: Thêm thành viên -->
+        <div id="group-details-add-section" class="hidden">
+          <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;">
+            ➕ Thêm thành viên mới
+          </div>
+          <div class="friend-picker" id="group-details-add-list" style="max-height: 120px;">
+            <p class="log-empty">Không còn bạn bè nào để thêm...</p>
+          </div>
+        </div>
+        
+        <!-- Section: Danh sách thành viên -->
+        <div>
+          <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;">
+            👥 Thành viên (<span id="group-details-count">0</span>)
+          </div>
+          <div class="friend-picker" id="group-details-member-list" style="max-height: 240px;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <!-- ========== THƯ VIỆN ========== -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>

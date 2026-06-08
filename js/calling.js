@@ -18,6 +18,7 @@ const RTC_CONFIG = {
    ============================================= */
 let localStream       = null;   // Stream camera/mic của mình
 let peerConnections   = {};     // { uid: RTCPeerConnection } — hỗ trợ gọi nhóm
+let remoteStreams     = {};     // { uid: MediaStream } — lưu trữ stream nhận được
 let activeCallId      = null;   // ID cuộc gọi đang hoạt động
 let callRole          = null;   // 'caller' | 'callee'
 let callType          = null;   // 'friend' | 'group'
@@ -316,7 +317,7 @@ async function answerCall(callId) {
     updates[`calls/${callId}/status`] = 'active';
     await db.ref().update(updates);
 
-    db.ref(`calls/${callId}/callerCandidates`).on('child_added', async (snap) => {
+    db.ref(`calls/${callId}/callerCandidates_${myUid}`).on('child_added', async (snap) => {
       const candidate = snap.val();
       if (candidate && pc.remoteDescription) {
         try { await pc.addIceCandidate(new RTCIceCandidate(candidate)); }
@@ -377,11 +378,23 @@ function cleanupCall() {
   });
   peerConnections = {};
 
+  // Reset remote streams
+  remoteStreams = {};
+
   // Tắt firebase listeners
   if (activeCallRef) { activeCallRef.off(); activeCallRef = null; }
   if (activeCallId && isFirebaseConfigured) {
     db.ref(`calls/${activeCallId}/callerCandidates`).off();
     db.ref(`calls/${activeCallId}/calleeCandidates`).off();
+    if (currentUser) {
+      const myUid = currentUser.uid;
+      db.ref(`calls/${activeCallId}/callerCandidates_${myUid}`).off();
+      db.ref(`calls/${activeCallId}/calleeCandidates_${myUid}`).off();
+    }
+    Object.keys(peerConnections).forEach(uid => {
+      db.ref(`calls/${activeCallId}/calleeCandidates_${uid}`).off();
+      db.ref(`calls/${activeCallId}/callerCandidates_${uid}`).off();
+    });
   }
 
   // Reset state
@@ -442,7 +455,7 @@ function createPeerConnection(remoteUid, callId, type) {
 
     if (callRole === 'caller') {
       if (type === 'group') {
-        db.ref(`calls/${callId}/callerCandidates`).push(candidateData);
+        db.ref(`calls/${callId}/callerCandidates_${remoteUid}`).push(candidateData);
       } else {
         db.ref(`calls/${callId}/callerCandidates`).push(candidateData);
       }
@@ -457,8 +470,12 @@ function createPeerConnection(remoteUid, callId, type) {
 
   // Remote stream handler
   pc.ontrack = (event) => {
-    console.log('[Calling] Remote track received from', remoteUid);
-    addRemoteStream(remoteUid, event.streams[0]);
+    console.log('[Calling] Remote track received from', remoteUid, event.track.kind);
+    if (!remoteStreams[remoteUid]) {
+      remoteStreams[remoteUid] = new MediaStream();
+    }
+    remoteStreams[remoteUid].addTrack(event.track);
+    addRemoteStream(remoteUid, remoteStreams[remoteUid]);
   };
 
   pc.onconnectionstatechange = () => {
@@ -466,7 +483,7 @@ function createPeerConnection(remoteUid, callId, type) {
     if (pc.connectionState === 'connected') {
       stopRingtone();
       startCallTimer();
-      updateCallStatus('Đang kết nối...');
+      updateCallStatus('🟢 Đang kết nối');
     }
     if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
       showToast('Kết nối bị gián đoạn!', 'error');
@@ -527,6 +544,8 @@ function addRemoteStream(remoteUid, stream) {
     videoEl.autoplay = true;
     videoEl.playsinline = true;
     videoEl.className = 'remote-video';
+    videoEl.muted = false;
+    videoEl.volume = 1.0;
 
     const nameLabel = document.createElement('div');
     nameLabel.className = 'remote-video-label';
@@ -541,7 +560,22 @@ function addRemoteStream(remoteUid, stream) {
     remoteGrid.appendChild(wrapper);
   }
 
-  videoEl.srcObject = stream;
+  if (videoEl.srcObject !== stream) {
+    videoEl.srcObject = stream;
+    videoEl.muted = false;
+    videoEl.volume = 1.0;
+    
+    // Đảm bảo phát luồng thành công để tránh browser autoplay restrictions
+    videoEl.play().catch(err => {
+      console.warn('[Calling] videoEl.play() failed, trying user interaction:', err);
+      // fallback: thử lại khi click vào overlay/bất cứ đâu
+      const playOnGesture = () => {
+        videoEl.play().catch(e => console.error(e));
+        document.removeEventListener('click', playOnGesture);
+      };
+      document.addEventListener('click', playOnGesture);
+    });
+  }
   updateCallStatus('🟢 Đang kết nối');
 }
 
