@@ -380,93 +380,103 @@
           <!-- Tab Nhóm Chat Riêng -->
           <div class="community-pane" id="pane-groups">
             <div class="groups-panel">
-              <button class="btn-create-group" onclick="openCreateGroupModal()">
-                ➕ Tạo nhóm mới
-              </button>
 
-              <!-- Danh sách nhóm -->
-              <div class="group-list-section">
-                <div class="group-list-title">💬 Nhóm của tôi</div>
-                <div id="group-list">
-                  <p class="log-empty">Chưa có nhóm nào...</p>
+              <!-- ===== CỘT TRÁI: Danh sách nhóm ===== -->
+              <div class="groups-sidebar">
+                <button class="btn-create-group" onclick="openCreateGroupModal()">
+                  ➕ Tạo nhóm mới
+                </button>
+
+                <!-- Danh sách nhóm -->
+                <div class="group-list-section">
+                  <div class="group-list-title">💬 Nhóm của tôi</div>
+                  <div id="group-list">
+                    <p class="log-empty">Chưa có nhóm nào...</p>
+                  </div>
                 </div>
               </div>
 
-              <!-- Placeholder khi chưa chọn nhóm -->
-              <div class="group-chat-placeholder" id="group-chat-placeholder">
-                <span class="ph-icon">💬</span>
-                <span>Chọn nhóm để bắt đầu chat</span>
-              </div>
+              <!-- ===== CỘT PHẢI: Khu vực chat ===== -->
+              <div class="groups-chat-area">
 
-              <!-- Chat nhóm -->
-              <div class="group-chat-section hidden" id="group-chat-section">
-                <div class="group-chat-header">
-                  <span class="group-chat-name" id="group-chat-header-name">👥 Nhóm</span>
-                  <div style="display:flex;gap:0.4rem;align-items:center;">
-                    <button class="btn-call-group" onclick="activeGroupId && callGroup(activeGroupId)">
-                      📞 Gọi nhóm
-                    </button>
-                    <button class="btn-group-details" onclick="activeGroupId && openGroupDetailsModal(activeGroupId)">
-                      ℹ️ Chi tiết
-                    </button>
-                    <button class="btn-group-search" onclick="toggleChatSearch()" title="Tìm kiếm lịch sử tin nhắn" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);padding:0.3rem 0.55rem;border-radius:8px;font-size:0.72rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">
-                      🔍
-                    </button>
-                    <button class="btn-leave-group"
-                      onclick="activeGroupId && leaveGroup(activeGroupId)">Rời nhóm</button>
-                  </div>
+                <!-- Placeholder khi chưa chọn nhóm -->
+                <div class="group-chat-placeholder" id="group-chat-placeholder">
+                  <span class="ph-icon">💬</span>
+                  <span>Chọn nhóm để bắt đầu chat</span>
                 </div>
 
-                <!-- Lịch sử tìm kiếm tin nhắn -->
-                <div class="group-chat-search-bar hidden" id="group-chat-search-bar" style="display:none;align-items:center;gap:0.4rem;padding:0.45rem 0.6rem;border-bottom:1px solid var(--border);background:rgba(0,0,0,0.2);">
-                  <input type="text" class="chat-search-input" id="group-chat-search-input" placeholder="Tìm kiếm tin nhắn..." style="flex:1;padding:0.35rem 0.6rem;font-size:0.75rem;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text-primary);outline:none;" oninput="searchChatHistory()"/>
-                  <button class="btn-search-nav" onclick="navigateSearch('prev')" style="background:none;border:none;color:var(--text-primary);cursor:pointer;font-size:0.75rem;">▲</button>
-                  <button class="btn-search-nav" onclick="navigateSearch('next')" style="background:none;border:none;color:var(--text-primary);cursor:pointer;font-size:0.75rem;">▼</button>
-                  <span class="search-result-count" id="search-result-count" style="font-size:0.65rem;font-family:'Space Mono',monospace;color:var(--text-secondary);">0/0</span>
-                  <button class="btn-close-search" onclick="closeChatSearch()" style="background:none;border:none;color:var(--accent-red);cursor:pointer;font-size:0.8rem;padding:0 0.2rem;">✕</button>
-                </div>
-
-                <!-- Picker panel cho stickers, emojis, gifs -->
-                <div class="chat-picker-panel hidden" id="chat-picker-panel">
-                  <div class="picker-tabs">
-                    <button class="picker-tab active" id="picker-tab-emojis" onclick="switchPickerTab('emojis')">😊 Emoji</button>
-                    <button class="picker-tab" id="picker-tab-stickers" onclick="switchPickerTab('stickers')">🐱 Sticker</button>
-                    <button class="picker-tab" id="picker-tab-gifs" onclick="switchPickerTab('gifs')">🎬 GIF</button>
-                  </div>
-                  <div class="picker-content" id="picker-content-emojis"></div>
-                  <div class="picker-content hidden" id="picker-content-stickers"></div>
-                  <div class="picker-content hidden" id="picker-content-gifs">
-                    <div class="gif-search-wrap">
-                      <input type="text" id="gif-search-input" placeholder="Tìm kiếm GIF..." oninput="searchGifs()"/>
+                <!-- Chat nhóm -->
+                <div class="group-chat-section hidden" id="group-chat-section">
+                  <div class="group-chat-header">
+                    <span class="group-chat-name" id="group-chat-header-name">👥 Nhóm</span>
+                    <div style="display:flex;gap:0.35rem;align-items:center;flex-wrap:wrap;">
+                      <button class="btn-group-bg" onclick="activeGroupId && openBgPickerModal(activeGroupId)" title="Đổi ảnh nền nhóm">
+                        🖼️ Ảnh nền
+                      </button>
+                      <button class="btn-call-group" onclick="activeGroupId && callGroup(activeGroupId)">
+                        📞 Gọi nhóm
+                      </button>
+                      <button class="btn-group-details" onclick="activeGroupId && openGroupDetailsModal(activeGroupId)">
+                        ℹ️ Chi tiết
+                      </button>
+                      <button class="btn-group-search" onclick="toggleChatSearch()" title="Tìm kiếm" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);padding:0.3rem 0.55rem;border-radius:8px;font-size:0.72rem;cursor:pointer;">
+                        🔍
+                      </button>
+                      <button class="btn-leave-group" onclick="activeGroupId && leaveGroup(activeGroupId)">Rời nhóm</button>
                     </div>
-                    <div class="gif-results" id="gif-results"></div>
+                  </div>
+
+                  <!-- Lịch sử tìm kiếm tin nhắn -->
+                  <div class="group-chat-search-bar hidden" id="group-chat-search-bar" style="display:none;align-items:center;gap:0.4rem;padding:0.45rem 0.6rem;border-bottom:1px solid var(--border);background:rgba(0,0,0,0.2);">
+                    <input type="text" class="chat-search-input" id="group-chat-search-input" placeholder="Tìm kiếm tin nhắn..." style="flex:1;padding:0.35rem 0.6rem;font-size:0.75rem;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text-primary);outline:none;" oninput="searchChatHistory()"/>
+                    <button class="btn-search-nav" onclick="navigateSearch('prev')" style="background:none;border:none;color:var(--text-primary);cursor:pointer;font-size:0.75rem;">▲</button>
+                    <button class="btn-search-nav" onclick="navigateSearch('next')" style="background:none;border:none;color:var(--text-primary);cursor:pointer;font-size:0.75rem;">▼</button>
+                    <span class="search-result-count" id="search-result-count" style="font-size:0.65rem;font-family:'Space Mono',monospace;color:var(--text-secondary);">0/0</span>
+                    <button class="btn-close-search" onclick="closeChatSearch()" style="background:none;border:none;color:var(--accent-red);cursor:pointer;font-size:0.8rem;padding:0 0.2rem;">✕</button>
+                  </div>
+
+                  <!-- Picker panel cho stickers, emojis, gifs -->
+                  <div class="chat-picker-panel hidden" id="chat-picker-panel">
+                    <div class="picker-tabs">
+                      <button class="picker-tab active" id="picker-tab-emojis" onclick="switchPickerTab('emojis')">😊 Emoji</button>
+                      <button class="picker-tab" id="picker-tab-stickers" onclick="switchPickerTab('stickers')">🐱 Sticker</button>
+                      <button class="picker-tab" id="picker-tab-gifs" onclick="switchPickerTab('gifs')">🎬 GIF</button>
+                    </div>
+                    <div class="picker-content" id="picker-content-emojis"></div>
+                    <div class="picker-content hidden" id="picker-content-stickers"></div>
+                    <div class="picker-content hidden" id="picker-content-gifs">
+                      <div class="gif-search-wrap">
+                        <input type="text" id="gif-search-input" placeholder="Tìm kiếm GIF..." oninput="searchGifs()"/>
+                      </div>
+                      <div class="gif-results" id="gif-results"></div>
+                    </div>
+                  </div>
+
+                  <!-- Inline reply preview bar -->
+                  <div class="reply-preview-bar hidden" id="reply-preview-bar">
+                    <div class="reply-preview-content">
+                      <span class="reply-title">Phản hồi <strong id="reply-to-name">A</strong>:</span>
+                      <span class="reply-text" id="reply-to-text">tin nhắn</span>
+                    </div>
+                    <button class="btn-cancel-reply" onclick="cancelReply()">✕</button>
+                  </div>
+
+                  <div class="group-chat-messages" id="group-chat-messages"></div>
+                  <div class="group-chat-input-wrap">
+                    <button class="chat-tool-btn" id="btn-chat-emoji" onclick="togglePickerPanel()" title="Emoji & Stickers">😊</button>
+                    <button class="chat-tool-btn" id="btn-chat-attach" onclick="triggerFileSelect()" title="Đính kèm tệp">📎</button>
+                    <button class="chat-tool-btn" id="btn-chat-mic" onclick="toggleVoiceRecord()" title="Gửi tin nhắn thoại">🎤</button>
+                    <input type="text" class="group-chat-input" id="group-chat-input"
+                           placeholder="Nhắn tin nhóm..." maxlength="300"/>
+                    <button class="btn-group-send" onclick="sendGroupMessage()">&#x27A4;</button>
                   </div>
                 </div>
 
-                <!-- Inline reply preview bar -->
-                <div class="reply-preview-bar hidden" id="reply-preview-bar">
-                  <div class="reply-preview-content">
-                    <span class="reply-title">Phản hồi <strong id="reply-to-name">A</strong>:</span>
-                    <span class="reply-text" id="reply-to-text">tin nhắn</span>
-                  </div>
-                  <button class="btn-cancel-reply" onclick="cancelReply()">✕</button>
-                </div>
+                <!-- Hidden File Input -->
+                <input type="file" id="chat-file-input" style="display:none" onchange="handleChatFileSelected(event)"/>
 
-                <div class="group-chat-messages" id="group-chat-messages"></div>
-                <div class="group-chat-input-wrap">
-                  <button class="chat-tool-btn" id="btn-chat-emoji" onclick="togglePickerPanel()" title="Emoji & Stickers">😊</button>
-                  <button class="chat-tool-btn" id="btn-chat-attach" onclick="triggerFileSelect()" title="Đính kèm tệp">📎</button>
-                  <button class="chat-tool-btn" id="btn-chat-mic" onclick="toggleVoiceRecord()" title="Gửi tin nhắn thoại">🎤</button>
-                  <input type="text" class="group-chat-input" id="group-chat-input"
-                         placeholder="Nhắn tin nhóm..." maxlength="300"/>
-                  <button class="btn-group-send" onclick="sendGroupMessage()">&#x27A4;</button>
-                </div>
-              </div>
-              
-              <!-- Hidden File Input -->
-              <input type="file" id="chat-file-input" style="display:none" onchange="handleChatFileSelected(event)"/>
-
-            </div>
+              </div><!-- end groups-chat-area -->
+            </div><!-- end groups-panel -->
           </div>
 
         </div>
@@ -541,6 +551,40 @@
     </div>
   </div>
 
+
+  <!-- ========== MODAL: Chọn ảnh nền nhóm ========== -->
+  <div class="bg-picker-modal hidden" id="modal-bg-picker">
+    <div class="bg-picker-box">
+      <div class="bg-picker-title">
+        <span>🖼️ Đổi ảnh nền nhóm</span>
+        <button class="bg-picker-close" onclick="closeBgPickerModal()">✕</button>
+      </div>
+
+      <div class="bg-preset-label">🎨 Gradient có sẵn</div>
+      <div class="bg-preset-grid" id="bg-preset-grid">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div class="bg-preset-label">📸 Tải ảnh lên</div>
+      <div class="bg-upload-wrap">
+        <label class="bg-upload-btn" for="bg-image-upload">
+          📁 Chọn ảnh từ máy tính...
+        </label>
+        <input type="file" id="bg-image-upload" accept="image/*" style="display:none" onchange="handleBgImageUpload(event)"/>
+      </div>
+
+      <!-- Preview -->
+      <div id="bg-preview-wrap" style="display:none;margin-bottom:0.85rem;">
+        <div class="bg-preset-label">👁️ Xem trước</div>
+        <div id="bg-preview-box" style="height:80px;border-radius:8px;border:1px solid var(--border);background-size:cover;background-position:center;"></div>
+      </div>
+
+      <div class="bg-picker-actions">
+        <button class="btn-bg-apply" onclick="applyGroupBackground()">✅ Áp dụng</button>
+        <button class="btn-bg-remove" onclick="removeGroupBackground()">🗑️ Xóa nền</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ========== THƯ VIỆN ========== -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>

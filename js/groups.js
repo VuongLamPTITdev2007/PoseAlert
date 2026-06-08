@@ -173,6 +173,8 @@ function openGroupChat(groupId) {
   setTimeout(() => {
     const input = document.getElementById('group-chat-input');
     if (input) input.focus();
+    // Load saved background
+    loadGroupBackground(groupId);
   }, 100);
 }
 
@@ -691,3 +693,224 @@ async function kickMember(groupId, targetUid) {
   }
 }
 
+/* =============================================
+   ẢNH NỀN NHÓM — BG PICKER
+   ============================================= */
+
+const BG_PRESETS = [
+  { label: 'Không', value: null },
+  { gradient: 'linear-gradient(135deg,#0f0c29,#302b63,#24243e)', label: 'Deep Purple' },
+  { gradient: 'linear-gradient(135deg,#0a1628,#0d3b6e,#00d4ff22)', label: 'Cyber Blue' },
+  { gradient: 'linear-gradient(135deg,#0d1117,#0a3622,#00ff8833)', label: 'Matrix Green' },
+  { gradient: 'linear-gradient(135deg,#1a0a2e,#6b1a4c,#ff6b9d33)', label: 'Neon Pink' },
+  { gradient: 'linear-gradient(135deg,#1c1c2e,#2d1b4e,#a855f744)', label: 'Violet Dream' },
+  { gradient: 'linear-gradient(135deg,#0f2027,#203a43,#2c5364)', label: 'Midnight Ocean' },
+  { gradient: 'linear-gradient(135deg,#1a1a2e,#16213e,#e94560)', label: 'Crimson Night' },
+  { gradient: 'linear-gradient(135deg,#0d0d0d,#1a1a1a,#ff9f4344)', label: 'Dark Amber' },
+  { gradient: 'linear-gradient(135deg,#021b21,#033d44,#07737a)', label: 'Deep Teal' },
+];
+
+let _bgPickerGroupId = null;
+let _bgSelectedValue = null; // null = remove, string = gradient/url
+
+function openBgPickerModal(groupId) {
+  _bgPickerGroupId = groupId;
+  _bgSelectedValue = undefined; // undefined = not changed yet
+
+  const modal = document.getElementById('modal-bg-picker');
+  if (modal) modal.classList.remove('hidden');
+
+  // Reset preview
+  const previewWrap = document.getElementById('bg-preview-wrap');
+  if (previewWrap) previewWrap.style.display = 'none';
+
+  // Reset file input
+  const fileInput = document.getElementById('bg-image-upload');
+  if (fileInput) fileInput.value = '';
+
+  renderBgPresets(groupId);
+}
+
+function closeBgPickerModal() {
+  const modal = document.getElementById('modal-bg-picker');
+  if (modal) modal.classList.add('hidden');
+  _bgPickerGroupId = null;
+  _bgSelectedValue = undefined;
+}
+
+function renderBgPresets(groupId) {
+  const grid = document.getElementById('bg-preset-grid');
+  if (!grid) return;
+
+  // Get current bg
+  const currentBg = localStorage.getItem(`group_bg_${groupId}`) || '';
+
+  grid.innerHTML = BG_PRESETS.map((p, i) => {
+    const isNone = p.value === null;
+    const val = isNone ? '' : p.gradient;
+    const isSelected = (currentBg === val) || (isNone && !currentBg);
+    const style = isNone ? '' : `background:${p.gradient};`;
+    return `
+      <div class="bg-preset-item ${isNone ? 'bg-preset-none' : ''} ${isSelected ? 'selected' : ''}"
+           style="${style}" title="${p.label}"
+           onclick="selectBgPreset(${i})">
+        ${isNone ? '🚫' : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function selectBgPreset(index) {
+  const p = BG_PRESETS[index];
+  _bgSelectedValue = p.value === null ? '' : p.gradient;
+
+  // Highlight selected
+  document.querySelectorAll('.bg-preset-item').forEach((el, i) => {
+    el.classList.toggle('selected', i === index);
+  });
+
+  // Show preview
+  const previewWrap = document.getElementById('bg-preview-wrap');
+  const previewBox = document.getElementById('bg-preview-box');
+  if (previewWrap && previewBox) {
+    if (_bgSelectedValue) {
+      previewBox.style.background = _bgSelectedValue;
+      previewWrap.style.display = 'block';
+    } else {
+      previewWrap.style.display = 'none';
+    }
+  }
+}
+
+function handleBgImageUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Limit size 3MB
+  if (file.size > 3 * 1024 * 1024) {
+    showToast('⚠️ Ảnh quá lớn! Tối đa 3MB.', 'error');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    _bgSelectedValue = `url(${dataUrl})`;
+
+    // Clear preset selection
+    document.querySelectorAll('.bg-preset-item').forEach(el => el.classList.remove('selected'));
+
+    // Show preview
+    const previewWrap = document.getElementById('bg-preview-wrap');
+    const previewBox = document.getElementById('bg-preview-box');
+    if (previewWrap && previewBox) {
+      previewBox.style.background = '';
+      previewBox.style.backgroundImage = `url(${dataUrl})`;
+      previewBox.style.backgroundSize = 'cover';
+      previewBox.style.backgroundPosition = 'center';
+      previewWrap.style.display = 'block';
+    }
+    showToast('📸 Ảnh đã sẵn sàng, nhấn Áp dụng!', 'info');
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyGroupBackground() {
+  if (!_bgPickerGroupId) return;
+  if (_bgSelectedValue === undefined) {
+    showToast('Hãy chọn một ảnh nền!', 'error');
+    return;
+  }
+
+  const groupId = _bgPickerGroupId;
+  const bgValue = _bgSelectedValue;
+
+  // Save to localStorage (instant, works offline)
+  if (bgValue) {
+    localStorage.setItem(`group_bg_${groupId}`, bgValue);
+  } else {
+    localStorage.removeItem(`group_bg_${groupId}`);
+  }
+
+  // Also save key/type to Firebase (not the full data url to save DB quota)
+  if (isFirebaseConfigured && currentUser) {
+    // Save gradient string (short) or a flag for custom image
+    const isDataUrl = bgValue && bgValue.startsWith('url(data:');
+    const fbValue = isDataUrl ? '__custom__' : (bgValue || null);
+    db.ref(`groups/${groupId}/bgPreset`).set(fbValue).catch(() => {});
+  }
+
+  applyBgToUI(groupId, bgValue);
+  closeBgPickerModal();
+  showToast('✅ Đã đổi ảnh nền nhóm!', 'success');
+}
+
+function removeGroupBackground() {
+  if (!_bgPickerGroupId) return;
+  _bgSelectedValue = '';
+  applyGroupBackground();
+}
+
+function applyBgToUI(groupId, bgValue) {
+  const chatSection = document.getElementById('group-chat-section');
+
+  if (bgValue && bgValue.startsWith('url(')) {
+    // Image URL
+    if (chatSection) {
+      chatSection.style.setProperty('--chat-bg-img', bgValue);
+    }
+  } else if (bgValue) {
+    // Gradient — convert to url-equivalent for ::before via CSS property hack
+    // We use a direct background on the pseudo-element via inline style trick
+    // Actually set it as a CSS var used in the ::before
+    if (chatSection) {
+      chatSection.style.setProperty('--chat-bg-img', 'none');
+      // Apply gradient directly to element with a before trick via data attr
+      chatSection.dataset.bgGradient = bgValue;
+      // Use a style tag trick
+      applyChatBgGradient(chatSection, bgValue);
+    }
+  } else {
+    if (chatSection) {
+      chatSection.style.setProperty('--chat-bg-img', 'none');
+      chatSection.dataset.bgGradient = '';
+      const overlay = chatSection.querySelector('.chat-bg-overlay');
+      if (overlay) overlay.remove();
+    }
+  }
+
+  // Also update group item in sidebar
+  const groupItem = document.querySelector(`.group-item[data-gid="${groupId}"]`);
+  if (groupItem) {
+    if (bgValue && bgValue.startsWith('url(')) {
+      groupItem.style.setProperty('--group-bg-img', bgValue);
+    } else if (bgValue) {
+      groupItem.style.setProperty('--group-bg-img', 'none');
+    } else {
+      groupItem.style.setProperty('--group-bg-img', 'none');
+    }
+  }
+}
+
+function applyChatBgGradient(chatSection, gradient) {
+  let overlay = chatSection.querySelector('.chat-bg-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.className = 'chat-bg-overlay';
+    overlay.style.cssText = `
+      position:absolute;inset:0;pointer-events:none;
+      border-radius:9px;z-index:0;opacity:0.12;
+    `;
+    chatSection.insertBefore(overlay, chatSection.firstChild);
+  }
+  overlay.style.background = gradient;
+}
+
+function loadGroupBackground(groupId) {
+  const bgValue = localStorage.getItem(`group_bg_${groupId}`);
+  if (bgValue) {
+    applyBgToUI(groupId, bgValue);
+  } else {
+    applyBgToUI(groupId, '');
+  }
+}

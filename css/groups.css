@@ -3,11 +3,40 @@
    ================================================ */
 
 /* ----- Panel Nhóm ----- */
+/* ================================================
+   LAYOUT 2 CỘT: Sidebar nhóm + Khu chat
+   ================================================ */
 .groups-panel {
   display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+  flex-direction: row;
+  gap: 0;
   height: 100%;
+  overflow: hidden;
+}
+
+/* ----- Cột trái: Danh sách nhóm ----- */
+.groups-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0.5rem 0.5rem 0;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.groups-sidebar::-webkit-scrollbar { width: 3px; }
+.groups-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* ----- Cột phải: Khu vực chat ----- */
+.groups-chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-left: 0.5rem;
+  overflow: hidden;
 }
 
 /* ----- Nút Tạo nhóm ----- */
@@ -39,26 +68,43 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 .group-list-title {
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   font-weight: 700;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.15rem;
+  padding-left: 0.2rem;
 }
 
 .group-item {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.5rem 0.6rem;
+  gap: 0.45rem;
+  padding: 0.45rem 0.5rem;
   background: var(--bg-card);
   border-radius: 8px;
   border: 1px solid var(--border);
   cursor: pointer;
   transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.group-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--group-bg-img, none);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.12;
+  border-radius: 7px;
+  pointer-events: none;
 }
 .group-item:hover, .group-item.active {
   border-color: rgba(0,255,136,0.3);
@@ -68,18 +114,26 @@
   border-color: var(--accent-green);
   box-shadow: 0 0 0 1px rgba(0,255,136,0.15);
 }
+.group-item.active::before { opacity: 0.2; }
 
 .group-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
   background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(0,255,136,0.15));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 0.9rem;
   flex-shrink: 0;
   border: 1px solid rgba(0,212,255,0.2);
+  overflow: hidden;
+}
+.group-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
 }
 
 .group-info {
@@ -125,6 +179,25 @@
   overflow: hidden;
   background: var(--bg-card);
   min-height: 0;
+  position: relative;
+}
+
+/* Ảnh nền khu chat */
+.group-chat-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--chat-bg-img, none);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.07;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 9px;
+}
+.group-chat-section > * {
+  position: relative;
+  z-index: 1;
 }
 
 .group-chat-header {
@@ -225,10 +298,179 @@
   text-align: center;
   border: 1px dashed var(--border);
   border-radius: 10px;
+  margin: 0;
 }
 .group-chat-placeholder .ph-icon {
-  font-size: 2rem;
-  opacity: 0.5;
+  font-size: 2.2rem;
+  opacity: 0.4;
+}
+
+/* ----- Nút đổi ảnh nền nhóm ----- */
+.btn-group-bg {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid rgba(168, 130, 255, 0.35);
+  border-radius: 8px;
+  background: rgba(168, 130, 255, 0.08);
+  color: #a882ff;
+  font-size: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+.btn-group-bg:hover {
+  background: rgba(168, 130, 255, 0.2);
+  box-shadow: 0 0 10px rgba(168, 130, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+/* ----- Modal chọn ảnh nền ----- */
+.bg-picker-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+.bg-picker-modal.hidden { display: none; }
+
+.bg-picker-box {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  width: 380px;
+  max-width: 95vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(168,130,255,0.15);
+}
+.bg-picker-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  justify-content: space-between;
+}
+.bg-picker-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: color 0.15s;
+}
+.bg-picker-close:hover { color: var(--accent-red); }
+
+.bg-preset-label {
+  font-size: 0.67rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 0.5rem;
+}
+
+.bg-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.45rem;
+  margin-bottom: 0.85rem;
+}
+.bg-preset-item {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.bg-preset-item:hover {
+  transform: scale(1.05);
+  border-color: rgba(255,255,255,0.4);
+}
+.bg-preset-item.selected {
+  border-color: var(--accent-green);
+  box-shadow: 0 0 8px rgba(0,255,136,0.4);
+}
+.bg-preset-none {
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  border: 1px dashed var(--border);
+}
+
+.bg-upload-wrap {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.85rem;
+}
+.bg-upload-btn {
+  flex: 1;
+  padding: 0.5rem;
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.bg-upload-btn:hover {
+  border-color: #a882ff;
+  color: #a882ff;
+  background: rgba(168,130,255,0.06);
+}
+
+.bg-picker-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+.btn-bg-apply {
+  flex: 1;
+  padding: 0.55rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #a882ff, #7c5cbf);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-bg-apply:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 15px rgba(168,130,255,0.4);
+}
+.btn-bg-remove {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid rgba(255,71,87,0.3);
+  border-radius: 10px;
+  background: rgba(255,71,87,0.08);
+  color: var(--accent-red);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-bg-remove:hover {
+  background: rgba(255,71,87,0.18);
 }
 
 /* ================================================
