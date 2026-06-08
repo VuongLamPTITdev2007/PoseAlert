@@ -5,7 +5,7 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{listings}
-\usepackage{color}
+\usepackage{xcolor}
 \usepackage{geometry}
 \usepackage{longtable}
 \usepackage{tabularx}
@@ -16,34 +16,13 @@
 \geometry{a4paper, margin=1in}
 \onehalfspacing
 
-\title{%
-    \vspace{1.8cm}
-    \textbf{\Huge BÁO CÁO DỰ ÁN}\[0.5cm]
-    \Large \textbf{PoseAlert — Ứng dụng Web Nhận diện và Cảnh báo Tư thế Ngồi Học}%
-\documentclass[12pt,a4paper]{article}
-\usepackage[utf8]{vietnam}
-\usepackage{amsmath,amssymb}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{listings}
-\usepackage{xcolor}
-\usepackage{geometry}
-\usepackage{longtable}
-\usepackage{caption}
-\usepackage{float}
-\usepackage{enumitem}
-\geometry{a4paper, margin=1in}
-
 % Code listing style
 \lstset{basicstyle=\ttfamily\footnotesize,breaklines=true}
 
-	itle{%
+\title{%
     \vspace{1.5cm}
-    	extbf{\Huge BÁO CÁO DỰ ÁN}\
-    \vspace{0.3cm}
-    \\% line break
-    \Large \textbf{Ứng dụng Web Cảnh Báo Tư Thế Ngồi Học — PoseAlert}\\
-    \vspace{0.3cm}
+    \textbf{\Huge BÁO CÁO DỰ ÁN}\\[0.3cm]
+    \Large \textbf{Ứng dụng Web Cảnh Báo Tư Thế Ngồi Học — PoseAlert}\\[0.3cm]
     \large Ứng dụng nhận diện tư thế thời gian thực với TensorFlow.js và MoveNet
 }
 \author{Nhóm thực hiện: \begin{tabular}{l}Vương Lâm \\ [Tên thành viên khác — điền vào]\end{tabular}}
@@ -52,10 +31,10 @@
 \begin{document}
 
 \maketitle
-	hispagestyle{empty}
+\thispagestyle{empty}
 \newpage
 
-	ableofcontents
+\tableofcontents
 \newpage
 
 % -----------------------------
@@ -296,8 +275,6 @@ async function predict(){
 \vfill
 \noindent{\small Bản báo cáo này là bản nháp chi tiết. Vui lòng chỉnh sửa thông tin thành viên và bổ sung số liệu thực nghiệm từ log thử nghiệm để hoàn thiện báo cáo cuối cùng.}
 
-\end{document}
-\end{itemize}
 
 \newpage
 \section{Phân tích yêu cầu và kiến trúc hệ thống}
