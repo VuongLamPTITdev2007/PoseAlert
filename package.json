@@ -1,0 +1,22 @@
+{
+  "name": "posealert",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PoseAlert frontend app",
+  "scripts": {
+    "lint": "eslint \"*.js\" \"js/**/*.js\" --ext .js",
+    "lint:fix": "eslint \"*.js\" \"js/**/*.js\" --ext .js --fix",
+    "format": "prettier --write \"**/*.{js,css,html,json,md}\""
+  }
+}
+{
+  "name": "posealert",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PoseAlert — AI posture detection web app",
+  "scripts": {
+    "lint": "eslint \"js/**/*.js\"",
+    "lint:fix": "eslint --fix \"js/**/*.js\"",
+    "format": "prettier --write \"**/*.{js,css,html,json,md}\""
+  }
+}

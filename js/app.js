@@ -7,6 +7,20 @@
  * ============================================================
  */
 
+// Tiny loader for external scripts (used to lazy-load TF.js and pose-detection)
+async function loadExternalScript(url) {
+  return new Promise((resolve, reject) => {
+    try {
+      const s = document.createElement('script');
+      s.src = url;
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('Failed to load ' + url));
+      document.head.appendChild(s);
+    } catch (e) { reject(e); }
+  });
+}
+
 // ============================================================
 // KHỞI ĐỘNG & DỪNG ỨNG DỤNG
 // ============================================================
@@ -52,6 +66,16 @@ async function startApp() {
     // ── BƯỚC 1: TensorFlow.js + MoveNet detector ──
     setStep("step-tfjs", "active");
     setLabel("Khởi tạo TensorFlow.js...", "Có thể mất 5 – 10 giây lần đầu");
+
+    // Lazy-load heavy external libs if they're not present
+    if (!window.tf) {
+      setLabel('Tải TensorFlow.js...', 'Đang tải thư viện...');
+      await loadExternalScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs');
+    }
+    if (!window.poseDetection) {
+      setLabel('Tải module pose-detection...', 'Đang tải thư viện...');
+      await loadExternalScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection');
+    }
 
     detector = await poseDetection.createDetector(
       poseDetection.SupportedModels.MoveNet,
