@@ -532,10 +532,11 @@
                            placeholder="Nhắn tin nhóm..." maxlength="300"/>
                     <button class="btn-group-send" onclick="sendGroupMessage()">&#x27A4;</button>
                   </div>
+                  <div class="chat-file-preview hidden" id="chat-file-preview"></div>
                 </div>
 
                 <!-- Hidden File Input -->
-                <input type="file" id="chat-file-input" style="display:none" onchange="handleChatFileSelected(event)"/>
+                <input type="file" id="chat-file-input" style="display:none" multiple onchange="handleChatFileSelected(event)"/>
 
               </div><!-- end groups-chat-area -->
             </div><!-- end groups-panel -->

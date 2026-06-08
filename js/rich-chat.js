@@ -5,6 +5,7 @@
 // Global state cache
 let loadedMessages = {};    // { msgId: msg }
 let replyingTo = null;      // { msgId, text, name }
+let pendingChatFiles = [];   // Files selected and waiting to send
 let activePickerTab = 'emojis';
 let searchMatches = [];     // [ { msgId, element } ]
 let activeSearchIndex = -1;
@@ -257,7 +258,7 @@ function escapeRegExp(string) {
 /* ==========================================================================
    RICH SEND MESSAGE
    ========================================================================== */
-function sendGroupMessageRich() {
+async function sendGroupMessageRich() {
   if (!currentUser || !activeGroupId || !isFirebaseConfigured) return;
 
   // Check block status
@@ -274,7 +275,17 @@ function sendGroupMessageRich() {
   if (!input) return;
 
   const text = input.value.trim();
-  if (!text) return;
+  if (!text && pendingChatFiles.length === 0) return;
+
+  if (pendingChatFiles.length > 0) {
+    await sendPendingChatFiles();
+  }
+
+  if (!text) {
+    input.value = '';
+    input.focus();
+    return;
+  }
 
   const messageData = {
     uid: currentUser.uid,
@@ -312,6 +323,11 @@ async function toggleVoiceRecord() {
 }
 
 async function startVoiceRecording() {
+  if (!currentUser || !activeGroupId) {
+    showToast('Chưa chọn nhóm để gửi tin nhắn thoại.', 'error');
+    return;
+  }
+
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     showToast('Trình duyệt không hỗ trợ ghi âm!', 'error');
     return;
@@ -537,57 +553,130 @@ function triggerFileSelect() {
 }
 
 async function handleChatFileSelected(event) {
-  const file = event.target.files[0];
-  if (!file || !activeGroupId) return;
+  const files = Array.from(event.target.files || []);
+  if (!files.length) return;
 
-  // Check block status
   const group = myGroups[activeGroupId];
   if (group && group.type === 'dm') {
     const peerUid = Object.keys(group.members).find(uid => uid !== currentUser.uid);
     if (peerUid && (myBlocks[peerUid] || myBlockedBy[peerUid])) {
       showToast('⚠️ Không thể gửi tệp! Người dùng đã bị chặn hoặc bạn đã bị chặn.', 'error');
+      event.target.value = '';
       return;
     }
   }
 
-  showToast('📁 Đang tải tệp lên...', 'info');
+  const newPending = files.map(file => ({
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    file
+  }));
+
+  pendingChatFiles = pendingChatFiles.concat(newPending);
+  renderPendingChatFiles();
+  event.target.value = '';
+}
+
+async function sendPendingChatFiles() {
+  if (!currentUser || !activeGroupId || pendingChatFiles.length === 0) return;
+
+  const filesToSend = [...pendingChatFiles];
+  for (const item of filesToSend) {
+    const success = await sendSinglePendingFile(item);
+    if (success) {
+      pendingChatFiles = pendingChatFiles.filter(p => p.id !== item.id);
+      renderPendingChatFiles();
+    }
+  }
+}
+
+async function sendSinglePendingFile(item) {
+  if (!currentUser || !activeGroupId || !item || !item.file) return false;
 
   try {
+    showToast(`📁 Đang tải tệp lên: ${item.file.name}`, 'info');
+
     let fileUrl = '';
     if (storage) {
-      const fileRef = storage.ref().child(`chats/${activeGroupId}/${Date.now()}_${file.name}`);
-      const snapshot = await fileRef.put(file);
+      const fileRef = storage.ref().child(`chats/${activeGroupId}/${Date.now()}_${item.file.name}`);
+      const snapshot = await fileRef.put(item.file);
       fileUrl = await snapshot.ref.getDownloadURL();
     } else {
-      if (file.size > 102400) {
+      if (item.file.size > 102400) {
         showToast('Tệp quá lớn! Vui lòng gửi tệp nhỏ hơn 100KB khi không dùng Firebase Storage.', 'error');
-        return;
+        return false;
       }
-      fileUrl = await fileToBase64(file);
+      fileUrl = await fileToBase64(item.file);
     }
 
     let type = 'file';
-    if (file.type.startsWith('image/')) type = 'image';
-    else if (file.type.startsWith('video/')) type = 'video';
+    if (item.file.type.startsWith('image/')) type = 'image';
+    else if (item.file.type.startsWith('video/')) type = 'video';
 
-    db.ref(`groups/${activeGroupId}/chat`).push({
+    await db.ref(`groups/${activeGroupId}/chat`).push({
       uid: currentUser.uid,
       name: currentUser.displayName || 'Ẩn danh',
       avatar: currentUser.photoURL || '',
       text: '',
       type: type,
       fileUrl: fileUrl,
-      fileName: file.name,
-      fileSize: file.size,
+      fileName: item.file.name,
+      fileSize: item.file.size,
       timestamp: firebase.database.ServerValue.TIMESTAMP
     });
 
-    showToast('Tải lên tệp thành công!', 'success');
+    showToast(`Tệp ${item.file.name} đã gửi thành công!`, 'success');
+    return true;
   } catch (err) {
     console.error(err);
-    showToast('Không thể tải tệp lên!', 'error');
+    showToast(`Không thể tải tệp ${item.file.name} lên!`, 'error');
+    return false;
   }
-  event.target.value = ''; // Reset input value
+}
+
+function getFilePreviewIcon(file) {
+  const name = (file.name || '').toLowerCase();
+  if (name.endsWith('.pdf')) return '📕';
+  if (name.endsWith('.zip') || name.endsWith('.rar') || name.endsWith('.7z') || name.endsWith('.tar') || name.endsWith('.gz')) return '📦';
+  if (name.endsWith('.doc') || name.endsWith('.docx')) return '📘';
+  if (name.endsWith('.xls') || name.endsWith('.xlsx') || name.endsWith('.csv')) return '📗';
+  if (name.endsWith('.ppt') || name.endsWith('.pptx')) return '📙';
+  if (file.type.startsWith('image/')) return '🖼️';
+  if (file.type.startsWith('video/')) return '🎞️';
+  if (file.type.startsWith('audio/')) return '🎧';
+  return '📎';
+}
+
+function renderPendingChatFiles() {
+  const preview = document.getElementById('chat-file-preview');
+  if (!preview) return;
+
+  if (pendingChatFiles.length === 0) {
+    preview.classList.add('hidden');
+    preview.innerHTML = '';
+    return;
+  }
+
+  preview.classList.remove('hidden');
+  preview.innerHTML = pendingChatFiles.map(item => {
+    const itemName = escapeHtml(item.file.name);
+    const itemSize = formatBytes(item.file.size);
+    const itemIcon = getFilePreviewIcon(item.file);
+    return `
+      <div class="chat-file-preview-card">
+        <span class="chat-file-preview-icon">${itemIcon}</span>
+        <div class="chat-file-preview-info">
+          <div class="chat-file-preview-name" title="${itemName}">${itemName}</div>
+          <div class="chat-file-preview-size">${itemSize}</div>
+        </div>
+        <button class="chat-file-preview-cancel" onclick="removePendingChatFile('${item.id}')" title="Hủy tệp">✕</button>
+      </div>
+    `;
+  }).join('');
+}
+
+function removePendingChatFile(id) {
+  pendingChatFiles = pendingChatFiles.filter(item => item.id !== id);
+  renderPendingChatFiles();
 }
 
 /* ==========================================================================
