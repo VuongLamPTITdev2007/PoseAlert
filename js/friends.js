@@ -558,6 +558,12 @@ function openDmChat(dmId, friendUid, friendName, friendAvatar) {
   if (section) section.classList.remove('hidden');
   if (placeholder) placeholder.classList.add('hidden');
 
+  // Mobile: chuyển sang chế độ chat full-screen
+  const friendsPanel = document.querySelector('.friends-panel');
+  if (friendsPanel && window.innerWidth <= 768) {
+    friendsPanel.classList.add('mobile-chat-open');
+  }
+
   // Cập nhật header
   const nameEl = document.getElementById('dm-peer-name');
   const avatarEl = document.getElementById('dm-peer-avatar');
@@ -890,4 +896,19 @@ function showToast(message, type = 'info') {
   toast.style.display = 'block';
   clearTimeout(toast._timer);
   toast._timer = setTimeout(() => { toast.style.display = 'none'; }, 3000);
+}
+
+/* =============================================
+   MOBILE NAVIGATION — DM Chat
+   ============================================= */
+/**
+ * Hàm quay lại danh sách bạn bè trên mobile
+ */
+function closeDmMobile() {
+  const friendsPanel = document.querySelector('.friends-panel');
+  if (friendsPanel) {
+    friendsPanel.classList.remove('mobile-chat-open');
+  }
+  // Deselect friend
+  document.querySelectorAll('.friend-item').forEach(el => el.classList.remove('dm-active'));
 }

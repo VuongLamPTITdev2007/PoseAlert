@@ -144,6 +144,13 @@
       <span class="session-clock"id="session-time">Phiên: 00:00:00</span>
     </div>
     <div class="header-right">
+      <!-- Nút camera toggle cho mobile -->
+      <button class="btn-mobile-camera" id="btn-mobile-camera"
+              onclick="toggleMobilePanel()"
+              title="Mở/đóng Camera Panel"
+              style="display:none;padding:0.3rem 0.5rem;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);border-radius:8px;color:var(--accent);font-size:0.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:700;">
+        📷 Camera
+      </button>
       <!-- Theme Switcher -->
       <div class="theme-switcher">
         <span class="theme-label">🎨 Giao diện</span>
@@ -178,6 +185,7 @@
       </div>
     </div>
   </header>
+
 
   <!-- ========== APP BODY ========== -->
   <div class="app-body">
@@ -428,6 +436,7 @@
                   <!-- Header -->
                   <div class="dm-chat-header" id="dm-chat-header">
                     <div class="dm-chat-peer">
+                      <button class="dm-back-btn" onclick="closeDmMobile()" title="Quay lại">← Về</button>
                       <div class="dm-peer-avatar-wrap">
                         <img class="dm-peer-avatar" id="dm-peer-avatar" src="" alt="" onerror="this.style.display='none'"/>
                         <span class="dm-peer-online-dot" id="dm-peer-online-dot"></span>
@@ -506,7 +515,10 @@
                 <!-- Chat nhóm -->
                 <div class="group-chat-section hidden" id="group-chat-section">
                   <div class="group-chat-header">
-                    <span class="group-chat-name" id="group-chat-header-name">👥 Nhóm</span>
+                    <div style="display:flex;align-items:center;min-width:0;">
+                      <button class="group-back-btn" onclick="closeGroupMobile()" title="Quay lại">← Về</button>
+                      <span class="group-chat-name" id="group-chat-header-name">👥 Nhóm</span>
+                    </div>
                     <div style="display:flex;gap:0.35rem;align-items:center;flex-wrap:wrap;">
                       <button class="btn-group-bg" onclick="activeGroupId && openBgPickerModal(activeGroupId)" title="Đổi ảnh nền nhóm">
                         🖼️ Ảnh nền

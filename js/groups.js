@@ -138,6 +138,12 @@ function openGroupChat(groupId) {
   if (chatSection)  chatSection.classList.remove('hidden');
   if (placeholder)  placeholder.classList.add('hidden');
 
+  // Mobile: chuyển sang chế độ chat full-screen
+  const groupsPanel = document.querySelector('.groups-panel');
+  if (groupsPanel && window.innerWidth <= 768) {
+    groupsPanel.classList.add('mobile-chat-open');
+  }
+
   // Cập nhật header
   const group = myGroups[groupId];
   const headerName = document.getElementById('group-chat-header-name');
@@ -914,3 +920,19 @@ function loadGroupBackground(groupId) {
     applyBgToUI(groupId, '');
   }
 }
+
+/* =============================================
+   MOBILE NAVIGATION — Group Chat
+   ============================================= */
+/**
+ * Quay lại danh sách nhóm trên mobile
+ */
+function closeGroupMobile() {
+  const groupsPanel = document.querySelector('.groups-panel');
+  if (groupsPanel) {
+    groupsPanel.classList.remove('mobile-chat-open');
+  }
+  // Deselect group item
+  document.querySelectorAll('.group-item').forEach(el => el.classList.remove('active'));
+}
+

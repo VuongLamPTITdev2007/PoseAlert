@@ -669,3 +669,127 @@
   display: flex;
   gap: 0.3rem;
 }
+
+/* ================================================
+   MOBILE RESPONSIVE — Groups Panel (≤ 768px)
+   ================================================ */
+@media (max-width: 768px) {
+  /* Panel: chuyển sang cột dọc */
+  .groups-panel {
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Sidebar: chiếm toàn bộ */
+  .groups-sidebar {
+    width: 100%;
+    height: 100%;
+    border-right: none;
+    border-bottom: none;
+    padding: 0.5rem;
+    flex-shrink: 0;
+    overflow-y: auto;
+  }
+
+  /* Ẩn sidebar khi đang chat */
+  .groups-panel.mobile-chat-open .groups-sidebar {
+    display: none;
+  }
+
+  /* Chat area: ẩn mặc định, fill hết khi đang chat */
+  .groups-chat-area {
+    width: 100%;
+    height: 100%;
+    padding-left: 0;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Hiện chat area khi chọn nhóm */
+  .groups-panel.mobile-chat-open .groups-chat-area {
+    display: flex;
+  }
+
+  /* Group chat section fill toàn bộ */
+  .group-chat-section {
+    flex: 1;
+    min-height: 0;
+    border-radius: 8px;
+  }
+
+  /* Nút back hiện trên mobile */
+  .group-back-btn {
+    display: flex !important;
+  }
+
+  /* Header nhóm gọn hơn */
+  .group-chat-header {
+    padding: 0.4rem 0.5rem;
+    gap: 0.3rem;
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+
+  /* Tên nhóm truncate */
+  .group-chat-name {
+    font-size: 0.72rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 120px;
+  }
+
+  /* Buttons header nhỏ hơn */
+  .group-chat-header .btn-group-bg,
+  .group-chat-header .btn-call-group,
+  .group-chat-header .btn-group-details,
+  .group-chat-header .btn-leave-group,
+  .group-chat-header .btn-group-search {
+    font-size: 0.62rem !important;
+    padding: 0.2rem 0.35rem !important;
+  }
+
+  /* Group item to hơn để dễ chạm */
+  .group-item {
+    padding: 0.6rem 0.55rem;
+  }
+
+  /* Group icon lớn hơn */
+  .group-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Placeholder fill chiều cao */
+  .group-chat-placeholder {
+    flex: 1;
+    min-height: 200px;
+  }
+}
+
+/* Nút back mobile cho groups — ẩn trên desktop */
+.group-back-btn {
+  display: none;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  color: var(--accent-green);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  margin-right: 0.3rem;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  font-family: 'DM Sans', sans-serif;
+}
+.group-back-btn:hover {
+  background: rgba(0,255,136,0.1);
+}

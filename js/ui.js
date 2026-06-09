@@ -234,3 +234,35 @@ function togglePrivacy() {
     console.error("❌ Lỗi togglePrivacy:", err);
   }
 }
+
+// ---------------------------------------------------------------
+// Mobile Panel Toggle — Hiện/ẩn panel camera trên điện thoại
+// ---------------------------------------------------------------
+function toggleMobilePanel() {
+  const panelLeft = document.querySelector('.panel-left');
+  const btn = document.getElementById('btn-mobile-camera');
+  if (!panelLeft) return;
+
+  const isExpanded = panelLeft.classList.toggle('mobile-expanded');
+  if (btn) {
+    btn.textContent = isExpanded ? '📷 Đóng' : '📷 Camera';
+    btn.style.background = isExpanded
+      ? 'rgba(0,212,255,0.25)'
+      : 'rgba(0,212,255,0.1)';
+  }
+}
+
+// Khởi tạo: tự động reset khi resize vượt breakpoint
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 768) {
+    // Reset mobile state khi quay lại desktop
+    const panelLeft = document.querySelector('.panel-left');
+    if (panelLeft) panelLeft.classList.remove('mobile-expanded');
+
+    const friendsPanel = document.querySelector('.friends-panel');
+    if (friendsPanel) friendsPanel.classList.remove('mobile-chat-open');
+
+    const groupsPanel = document.querySelector('.groups-panel');
+    if (groupsPanel) groupsPanel.classList.remove('mobile-chat-open');
+  }
+});
