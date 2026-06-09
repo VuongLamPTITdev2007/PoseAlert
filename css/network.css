@@ -122,3 +122,168 @@
   color: var(--text-secondary);
   font-family: 'Space Mono', monospace;
 }
+
+/* ====================================================
+   NÚT KẾT BẠN TRONG DANH SÁCH THÀNH VIÊN PHÒNG
+   ==================================================== */
+.btn-add-room-friend {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 0.22rem 0.55rem;
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  border-radius: 6px;
+  background: rgba(0, 212, 255, 0.08);
+  color: var(--accent);
+  font-size: 0.65rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+.btn-add-room-friend:hover {
+  background: rgba(0, 212, 255, 0.2);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.25);
+  transform: translateY(-1px);
+}
+.btn-add-room-friend.sent {
+  background: rgba(0, 255, 136, 0.1);
+  color: var(--accent-green);
+  border-color: rgba(0, 255, 136, 0.3);
+  cursor: default;
+}
+.btn-add-room-friend.sent:hover {
+  transform: none;
+  box-shadow: none;
+}
+.btn-add-room-friend.friend {
+  background: rgba(158, 158, 158, 0.08);
+  color: var(--text-secondary);
+  border-color: var(--border);
+  cursor: default;
+  font-size: 0.6rem;
+}
+.btn-add-room-friend.friend:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* ====================================================
+   CHAT NAME CLICKABLE (trong tin nhắn phòng)
+   ==================================================== */
+.chat-name-link {
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 0.68rem;
+  font-weight: 700;
+  transition: color 0.15s, text-shadow 0.15s;
+  border-radius: 3px;
+  padding: 0 1px;
+}
+.chat-name-link:hover {
+  color: #fff;
+  text-shadow: 0 0 8px var(--accent);
+}
+
+/* ====================================================
+   USER POPUP — Khi click tên trong chat
+   ==================================================== */
+.user-chat-popup {
+  position: fixed;
+  z-index: 10000;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  min-width: 200px;
+  max-width: 240px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.12);
+  animation: popupFadeIn 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+@keyframes popupFadeIn {
+  from { opacity: 0; transform: scale(0.92) translateY(-4px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+.user-chat-popup .popup-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--bg-main);
+  border: 2px solid rgba(0,212,255,0.3);
+  flex-shrink: 0;
+}
+.user-chat-popup .popup-info {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.user-chat-popup .popup-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.user-chat-popup .popup-uid {
+  font-size: 0.6rem;
+  color: var(--text-secondary);
+  font-family: 'Space Mono', monospace;
+  margin-top: 0.15rem;
+}
+.user-chat-popup .popup-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+.popup-btn-add {
+  flex: 1;
+  padding: 0.42rem 0.6rem;
+  border: 1px solid rgba(0,212,255,0.35);
+  border-radius: 8px;
+  background: rgba(0,212,255,0.1);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  text-align: center;
+}
+.popup-btn-add:hover {
+  background: rgba(0,212,255,0.22);
+  box-shadow: 0 0 12px rgba(0,212,255,0.3);
+}
+.popup-btn-add.sent {
+  background: rgba(0,255,136,0.1);
+  color: var(--accent-green);
+  border-color: rgba(0,255,136,0.3);
+  cursor: default;
+}
+.popup-btn-add.friend {
+  background: rgba(158,158,158,0.08);
+  color: var(--text-secondary);
+  border-color: var(--border);
+  cursor: default;
+}
+.popup-btn-close {
+  padding: 0.42rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.popup-btn-close:hover {
+  color: var(--accent-red);
+  border-color: rgba(255,71,87,0.3);
+}

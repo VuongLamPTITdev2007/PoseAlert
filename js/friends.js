@@ -219,6 +219,8 @@ function listenToFriends() {
     renderFriendList();
     // Cập nhật friend-picker trong modal tạo nhóm
     if (typeof renderFriendPicker === 'function') renderFriendPicker();
+    // Cập nhật nút kết bạn trong danh sách thành viên phòng
+    if (typeof refreshRoomMemberButtons === 'function') refreshRoomMemberButtons();
   });
 }
 
@@ -236,6 +238,8 @@ function listenToFriendRequests() {
     });
     renderFriendRequests();
     updateFriendBadge();
+    // Cập nhật nút kết bạn trong danh sách thành viên phòng
+    if (typeof refreshRoomMemberButtons === 'function') refreshRoomMemberButtons();
   });
 }
 

@@ -114,6 +114,19 @@ function renderMemberList(members) {
     const statusIcon = getStatusIcon(m.status);
     const statusClass = getStatusClass(m.status);
 
+    // Xác định trạng thái kết bạn
+    let addBtnHtml = '';
+    if (!isMe && currentUser) {
+      const btnState = getRoomFriendBtnState(m.uid);
+      addBtnHtml = `
+        <button class="btn-add-room-friend ${btnState.cls}"
+                id="room-add-btn-${m.uid}"
+                onclick="${btnState.onclick}"
+                ${btnState.disabled ? 'disabled' : ''}>
+          ${btnState.label}
+        </button>`;
+    }
+
     return `
       <div class="member-item ${isMe ? 'member-me' : ''}" data-uid="${m.uid}">
         <div class="member-avatar-wrap">
@@ -121,13 +134,39 @@ function renderMemberList(members) {
           <span class="member-status-dot ${statusClass}"></span>
         </div>
         <div class="member-info">
-          <span class="member-name">${m.name}${isMe ? ' (Bạn)' : ''}</span>
+          <span class="member-name">${escapeHtml(m.name)}${isMe ? ' (Bạn)' : ''}</span>
           <span class="member-pose">${statusIcon} ${m.poseState || '—'}</span>
         </div>
+        ${addBtnHtml}
       </div>
     `;
   }).join('');
 }
+
+/* ---------- XÁC ĐỊNH TRẠNG THÁI NÚT KẾT BẠN ---------- */
+function getRoomFriendBtnState(uid) {
+  // Cần myFriends từ friends.js (được load trước)
+  const friends = (typeof myFriends !== 'undefined') ? myFriends : {};
+  const pending = (typeof pendingRequests !== 'undefined') ? pendingRequests : {};
+
+  if (friends[uid] && friends[uid].status === 'accepted') {
+    return { cls: 'friend', label: '✓ Bạn bè', onclick: '', disabled: true };
+  }
+  if (friends[uid] && friends[uid].status === 'pending') {
+    return { cls: 'sent', label: '✓ Đã gửi', onclick: '', disabled: true };
+  }
+  if (pending[uid]) {
+    // Người ta đã gửi cho mình — mình có thể chấp nhận
+    return { cls: 'sent', label: '🔔 Đợi xác nhận', onclick: `acceptFriendRequest('${uid}')`, disabled: false };
+  }
+  return {
+    cls: '',
+    label: '+ Kết bạn',
+    onclick: `roomAddFriend('${uid}')`,
+    disabled: false
+  };
+}
+
 
 function getStatusIcon(status) {
   switch (status) {
@@ -150,4 +189,36 @@ function getStatusClass(status) {
 function updateOnlineCount(count) {
   const el = document.getElementById('online-count');
   if (el) el.textContent = count;
+}
+
+/* =============================================
+   CẬP NHẬT TRẠNG THÁI NÚT KẾT BẠN TRONG PHÒNG
+   ============================================= */
+/**
+ * Cập nhật lại trạng thái tất cả nút "Kết bạn" trong member-list
+ * khi myFriends hoặc pendingRequests thay đổi (gọi từ friends.js)
+ */
+function refreshRoomMemberButtons() {
+  const memberList = document.getElementById('member-list');
+  if (!memberList || !currentUser) return;
+
+  // Lấy tất cả các member-item
+  const memberItems = memberList.querySelectorAll('.member-item');
+  memberItems.forEach(item => {
+    const uid = item.dataset.uid;
+    if (!uid || uid === currentUser.uid) return;
+
+    const btn = item.querySelector('.btn-add-room-friend');
+    if (!btn) return;
+
+    const state = getRoomFriendBtnState(uid);
+    btn.className = `btn-add-room-friend ${state.cls}`;
+    btn.textContent = state.label;
+    btn.disabled = state.disabled;
+    if (state.onclick && !state.disabled) {
+      btn.setAttribute('onclick', state.onclick);
+    } else {
+      btn.removeAttribute('onclick');
+    }
+  });
 }
